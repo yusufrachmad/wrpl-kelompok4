@@ -7,7 +7,7 @@ import re
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'ngonolho123'
+app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'store'
 
 mysql = MySQL(app)
@@ -76,7 +76,7 @@ def register():
         mysql.connection.commit()
         session['name'] = request.form['name']
         session['email'] = request.form['email']
-        return redirect(url_for('home'))
+        return redirect(url_for('login'))
         
 @app.route('/profile', methods=["GET", "POST"])
 def profile():
