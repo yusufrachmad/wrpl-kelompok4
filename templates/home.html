@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+
+<div class="header animate__animated animate__fadeInUp animate__fast">
+  <img class="decoration-logo animate__animated animate__flip animate__infinite	animate__delay-075s" src="static\img\logo.png" alt="logo">
+  <img class="decoration" src="static\img\header.png" alt="header">
+  <div class="header-content container">
+    <p class="header-title">BukaPee</p>
+    <p class="header-tagline">Buku Sumber Ilmu</p>
+    <p class="header-description">Beli Buku Dapat Buku</p>
+  </div>    
+</div>
+
+<div class="container animate__animated animate__fadeInUp animate__fast">
+ <div class="starter-template">
+ <h1>Daftar Produk</h1>
+ 
+{% for row in products %}
+ <div class="list-produk animate__animated animate__fadeInUp animate__fast">
+   <a class="tombol-detail" href="/products/{{row.0}}">
+    <img c src="{{ row.4 }}" alt="produk">
+    <h5>{{row.1}}</h5>
+    <h6>Rp{{row.3}}</h6>
+   </a>
+ </div>
+
+
+ {% endfor %}
+
+
+
+
+ </div>
+</div>
+
+
+<!-- /.container -->
+
+
+{% endblock %}
