@@ -74,8 +74,6 @@ def register():
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO accounts (name, email, password) VALUES (%s,%s,%s)",(nama,email,hash_password,))
         mysql.connection.commit()
-        session['name'] = request.form['name']
-        session['email'] = request.form['email']
         return redirect(url_for('login'))
         
 @app.route('/profile', methods=["GET", "POST"])
