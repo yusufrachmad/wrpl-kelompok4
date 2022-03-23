@@ -14,10 +14,10 @@
   </div>    
 </div>
 
-<div class="container animate__animated animate__fadeInUp animate__fast">
+<div class="container container-home animate__animated animate__fadeInUp animate__fast">
  <div class="starter-template">
  <h1>Daftar Produk</h1>
- 
+ <div class="row justify-content-center">
 {% for row in products %}
  <div class="list-produk animate__animated animate__fadeInUp animate__fast">
    <a class="tombol-detail" href="/products/{{row.0}}">
@@ -27,17 +27,19 @@
    </a>
  </div>
 
-
  {% endfor %}
+</div>
+
+ <div class="container">
+   <a class="btn btn-link float-right" href="/all-product">Lihat Semua--></a>
+
+ </div>
 
 
 
 
  </div>
 </div>
-
-
-<!-- /.container -->
 
 
 {% endblock %}
