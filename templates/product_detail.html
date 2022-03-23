@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block title %} Produk Detail {% endblock %}
+
+{% block body %}
+
+<div class="container">
+ <div class="starter-template">
+ <h1>Produk Detail</h1>
+    <div>
+    {% for row in products %}   
+    </div>
+    <div class="row">
+        <div class="product-detail animate__animated animate__fadeInUp animate__faster">
+            <img c src="{{ row.4 }}" alt="produk">
+            <div class="product-detail.deskripsi"> 
+                <div>
+                    <h3><strong>{{row.1}}</strong></h3>
+                </div>
+                <p>{{row.2}}</p>
+                <h3><strong>Rp{{row.3}}</strong></h3>
+            </div>
+            <a class="tombol-back" href="/">Back</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
