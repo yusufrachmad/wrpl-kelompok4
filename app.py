@@ -61,7 +61,7 @@ def allproduct():
 @app.route('/products/<id>')
 def detail(id):
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM products WHERE id=%s", (id,))
+    cur.execute("SELECT * FROM products JOIN accounts ON products.user_id = accounts.id WHERE products.id=%s", (id,))
     data = cur.fetchall()
     cur.close()
     return render_template('product_detail.html', products=data)
@@ -154,12 +154,12 @@ def insertProduct():
         nama = request.form['nama']
         deskripsi = request.form['deskripsi']
         harga = request.form['harga']
-        image_product = request.files['image_product']
-        if image_product and allowed_file(image_product.filename):
-            filename = secure_filename(image_product.filename)
-            image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        url = uploadImage(request.files['image_product'])
+        #if image_product and allowed_file(image_product.filename):
+            #filename = secure_filename(image_product.filename)
+            #image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO products (nama, deskripsi, harga, image_product, user_id) VALUES (%s,%s,%s,%s,%s)", (nama, deskripsi, harga, filename, session['id'],))
+        cur.execute("INSERT INTO products (nama, deskripsi, harga, image_product, user_id) VALUES (%s,%s,%s,%s,%s)", (nama, deskripsi, harga, url, session['id'],))
         mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
@@ -172,12 +172,12 @@ def updateProduct():
         nama = request.form['nama']
         deskripsi = request.form['deskripsi']
         harga = request.form['harga']
-        image_product = request.files['image_product']
-        if image_product and allowed_file(image_product.filename):
-            filename = secure_filename(image_product.filename)
-            image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        url = uploadImage(request.files['image_product'])
+        #if image_product and allowed_file(image_product.filename):
+            #filename = secure_filename(image_product.filename)
+            #image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE products SET nama=%s, deskripsi=%s, harga=%s, image_product=%s WHERE id=(%s)", (nama, deskripsi, harga, filename, id,))
+        cur.execute("UPDATE products SET nama=%s, deskripsi=%s, harga=%s, image_product=%s WHERE id=(%s)", (nama, deskripsi, harga, url, id,))
         mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
@@ -188,6 +188,7 @@ def deleteProduct(id):
     if 'loggedin' in session:
         cur = mysql.connection.cursor()
         cur.execute("DELETE FROM products WHERE id=(%s)", (id,))
+        mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
     return redirect(url_for('login')) 

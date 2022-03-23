@@ -11,7 +11,7 @@
  <div class="starter-template">
 
 
- <h1>Tampilkan Data</h1>
+ <h1>List Product</h1>
 
 
  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Tambah Data</button>
@@ -53,7 +53,7 @@
  <td>{{ row.1 }}</td>
  <td>{{ row.2 }}</td>
  <td>{{ row.3 }}</td>
- <td><img c src="static/uploads/{{row.4}}" alt="produk"></td>
+ <td><img c src="{{row.4}}" alt="produk"></td>
  <td>
 
 
@@ -98,7 +98,7 @@
  <div class="modal-body">
 
 
- <form action="{{ url_for('updateProduct') }}" method="POST">
+ <form action="{{ url_for('updateProduct') }}" method="POST" enctype="multipart/form-data">
 
 
  <div class="form-group">
@@ -115,7 +115,7 @@
  <input type="number" class="form-control" name="harga" value="{{ row.3 }}">
 
  <label>Gambar:</label>
- <input type="file" class="form-control-file" value={{row.4}}>
+ <input type="file" class="form-control-file" name="image_product" value="{{ row.4 }}">
  </div>
 
 
