@@ -2,11 +2,11 @@ from flask import Flask, flash, render_template, request, url_for, redirect, ses
 from flask_mysqldb import MySQL, MySQLdb
 import MySQLdb.cursors
 from flask_bcrypt import bcrypt
+import pymysql
 import urllib.request 
 import os
 import base64
 import requests
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -25,6 +25,15 @@ app.config['SECRET_KEY'] = "your secret key"
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def array_merge( first_array , second_array ):
+	if isinstance( first_array , list ) and isinstance( second_array , list ):
+		return first_array + second_array
+	elif isinstance( first_array , dict ) and isinstance( second_array , dict ):
+		return dict( list( first_array.items() ) + list( second_array.items() ) )
+	elif isinstance( first_array , set ) and isinstance( second_array , set ):
+		return first_array.union( second_array )
+	return False	
 
 def uploadImage(image_file):
     image_b64 = base64.b64encode(image_file.read()).decode('ascii')
@@ -154,12 +163,13 @@ def insertProduct():
         nama = request.form['nama']
         deskripsi = request.form['deskripsi']
         harga = request.form['harga']
+        stok = request.form['stock']
         url = uploadImage(request.files['image_product'])
         #if image_product and allowed_file(image_product.filename):
             #filename = secure_filename(image_product.filename)
             #image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO products (nama, deskripsi, harga, image_product, user_id) VALUES (%s,%s,%s,%s,%s)", (nama, deskripsi, harga, url, session['id'],))
+        cur.execute("INSERT INTO products (nama, stock, deskripsi, harga, image_product, user_id) VALUES (%s,%s,%s,%s,%s,%s)", (nama, stok, deskripsi, harga, url, session['id'],))
         mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
@@ -172,12 +182,13 @@ def updateProduct():
         nama = request.form['nama']
         deskripsi = request.form['deskripsi']
         harga = request.form['harga']
+        stok = request.form['stock']
         url = uploadImage(request.files['image_product'])
         #if image_product and allowed_file(image_product.filename):
             #filename = secure_filename(image_product.filename)
             #image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE products SET nama=%s, deskripsi=%s, harga=%s, image_product=%s WHERE id=(%s)", (nama, deskripsi, harga, url, id,))
+        cur.execute("UPDATE products SET nama=%s, deskripsi=%s, harga=%s, image_product=%s, stock=%s WHERE id=(%s)", (nama, deskripsi, harga, url, stok, id,))
         mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
@@ -192,6 +203,95 @@ def deleteProduct(id):
         cur.close()
         return redirect(url_for('userProduct'))
     return redirect(url_for('login')) 
+
+@app.route('/products/addcart', methods = ['POST'])
+def addToCart():
+    if 'loggedin' in session:
+        id = request.form['id']
+        quantity = request.form['stock']
+        if id and quantity and request.method == 'POST':
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("SELECT * FROM products WHERE id=%s", id)
+            row = cur.fetchone
+            itemQuery = { row['id'] : {'nama' : row['nama'], 'id' : row['id'], 'stock' : quantity, 'harga' : row['harga'], 
+                        'image_product' : row['image_product'], 'total_price': quantity * row['harga']}}
+            session.modified = True
+            if 'cart_item' in session:
+                if row['id'] in session['cart_item']:
+                    for key in session['cart_item'].items():
+                        if row['id'] == key:
+                            old_quantity = session['cart_item'][key]['stock']
+                            total_quantity = old_quantity + quantity
+                            session['cart_item'][key]['stock'] = total_quantity
+                            session['cart_item'][key]['total_price'] = total_quantity * row['harga']
+                else:
+                    session['cart_item'] = array_merge(session['cart_item'], itemQuery)
+            else:
+                session['cart_item'] = itemQuery
+                
+            return redirect(url_for('detail')) 
+        else:
+            return 'Error'
+    return redirect(url_for('login'))
+
+@app.route('/cart')
+def cart():
+    if 'loggedin' in session:
+        all_total_price = 0
+        all_total_quantity = 0
+        session.modified = True
+        if 'cart_item' not in session:
+            return redirect(request.referrer)
+        elif 'cart_item' in session:
+            for key, value in session['cart_item'].items():
+                individual_quantity = int(session['cart_item'][key]['quantity'])
+                individual_price = float(session['cart_item'][key]['total_price'])
+                all_total_quantity = all_total_quantity + individual_quantity
+                all_total_price = all_total_price + individual_price
+        else:
+            session['all_total_quantity'] = all_total_quantity
+            session['all_total_price'] = all_total_price
+        return render_template("cart.html")
+    return redirect(url_for('login'))
+
+@app.route('/updateCart/<id>', methods=["POST"])
+def updateCart(id):
+    if 'cart_item' not in session and len(session['cart_item']) <= 0:
+        return redirect(url_for('home'))
+    if request.method == "POST":
+        quantity = request.form['stock']
+        session.modified = True
+        for key, products in session['cart_item'].items():
+            if int(key) == id:
+                products['stock'] = quantity
+                return redirect(url_for('cart'))
+
+@app.route('/deleteCart/<id>')
+def deleteCart(id):
+    all_total_price = 0
+    all_total_quantity = 0
+    session.modified = True
+    for item in session['cart_item'].items():
+        if item[0] == id:    
+            session['cart_item'].pop(item[0], None)
+            if 'cart_item' in session:
+                for key, value in session['cart_item'].items():
+                    individual_quantity = int(session['cart_item'][key]['quantity'])
+                    individual_price = float(session['cart_item'][key]['total_price'])
+                    all_total_quantity = all_total_quantity + individual_quantity
+                    all_total_price = all_total_price + individual_price
+                break
+        if all_total_quantity == 0:
+            session.clear()
+        else:
+            session['all_total_quantity'] = all_total_quantity
+            session['all_total_price'] = all_total_price
+        return redirect(url_for('detail'))
+
+@app.route('/emptyCart')
+def emptyCart():
+    session.clear()
+    return redirect(url_for('home'))
 
 @app.route('/about-us')
 def aboutUs():
