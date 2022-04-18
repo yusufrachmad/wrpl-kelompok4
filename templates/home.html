@@ -20,11 +20,18 @@
  <div class="row justify-content-center">
 {% for row in products %}
  <div class="list-produk animate__animated animate__fadeInUp animate__fast">
-   <a class="tombol-detail" href="/products/{{row.0}}">
+  <a class="tombol-detail" href="/products/{{row.0}}">
     <img c src="{{ row.4 }}" alt="produk">
     <h5>{{row.1}}</h5>
     <h6>Rp{{row.3}}</h6>
-   </a>
+  </a>
+    <!-- <form method="post" action="{{url_for('addToCart')}}">
+      <div class="add-to-cart">
+        <input type="hidden" name="pid" value="{{ row.0 }}"/>
+        <input type="number" name="quantity" class="product-quantity" id="" value="1" min="0" max="{{ row.7 }}">
+        <input type="submit" value="Add to Cart" class="default-btn" />
+      </div>
+    </form> -->
  </div>
 
  {% endfor %}
@@ -34,8 +41,6 @@
    <a class="btn btn-link float-right" href="/all-product">Lihat Semua--></a>
 
  </div>
-
-
 
 
  </div>

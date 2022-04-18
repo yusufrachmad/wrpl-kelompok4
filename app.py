@@ -1,8 +1,7 @@
-from flask import Flask, flash, render_template, request, url_for, redirect, session
+from flask import Flask, flash, render_template, request, request_started, url_for, redirect, session
 from flask_mysqldb import MySQL, MySQLdb
 import MySQLdb.cursors
 from flask_bcrypt import bcrypt
-import pymysql
 import urllib.request 
 import os
 import base64
@@ -70,7 +69,7 @@ def allproduct():
 @app.route('/products/<id>')
 def detail(id):
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM products JOIN accounts ON products.user_id = accounts.id WHERE products.id=%s", (id,))
+    cur.execute("SELECT * FROM products JOIN accounts ON products.user_id = accounts.uid WHERE products.pid=%s", (id,))
     data = cur.fetchall()
     cur.close()
     return render_template('product_detail.html', products=data)
@@ -88,7 +87,7 @@ def login():
 
         if len(accounts) > 0:
             if bcrypt.hashpw(password, accounts["password"].encode('utf-8')) == accounts["password"].encode('utf-8'):
-                session['id'] = accounts['id']
+                session['id'] = accounts['uid']
                 session['name'] = accounts['name']
                 session['email'] = accounts['email']
                 session['loggedin'] = True
@@ -124,7 +123,7 @@ def register():
 def profile():
     if 'loggedin' in session:
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT * FROM accounts WHERE id=(%s)", (session['id'],))
+        cur.execute("SELECT * FROM accounts WHERE uid=(%s)", (session['id'],))
         user = cur.fetchone()
         cur.close()
         return render_template('user-detail.html', user=user)
@@ -178,7 +177,7 @@ def insertProduct():
 @app.route('/user-product/edit-data', methods=["POST"])
 def updateProduct():
     if 'loggedin' in session:
-        id = request.form['id']
+        id = request.form['pid']
         nama = request.form['nama']
         deskripsi = request.form['deskripsi']
         harga = request.form['harga']
@@ -188,7 +187,7 @@ def updateProduct():
             #filename = secure_filename(image_product.filename)
             #image_product.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE products SET nama=%s, deskripsi=%s, harga=%s, image_product=%s, stock=%s WHERE id=(%s)", (nama, deskripsi, harga, url, stok, id,))
+        cur.execute("UPDATE products SET nama=%s, deskripsi=%s, harga=%s, image_product=%s, stock=%s WHERE pid=(%s)", (nama, deskripsi, harga, url, stok, id,))
         mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
@@ -198,95 +197,68 @@ def updateProduct():
 def deleteProduct(id):
     if 'loggedin' in session:
         cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM products WHERE id=(%s)", (id,))
+        cur.execute("DELETE FROM products WHERE pid=(%s)", (id,))
         mysql.connection.commit()
         cur.close()
         return redirect(url_for('userProduct'))
     return redirect(url_for('login')) 
 
-@app.route('/products/addcart', methods = ['POST'])
+@app.route('/addcart', methods = ['POST'])
 def addToCart():
-    if 'loggedin' in session:
-        id = request.form['id']
-        quantity = request.form['stock']
-        if id and quantity and request.method == 'POST':
-            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cur.execute("SELECT * FROM products WHERE id=%s", id)
-            row = cur.fetchone
-            itemQuery = { row['id'] : {'nama' : row['nama'], 'id' : row['id'], 'stock' : quantity, 'harga' : row['harga'], 
-                        'image_product' : row['image_product'], 'total_price': quantity * row['harga']}}
-            session.modified = True
-            if 'cart_item' in session:
-                if row['id'] in session['cart_item']:
-                    for key in session['cart_item'].items():
-                        if row['id'] == key:
-                            old_quantity = session['cart_item'][key]['stock']
-                            total_quantity = old_quantity + quantity
-                            session['cart_item'][key]['stock'] = total_quantity
-                            session['cart_item'][key]['total_price'] = total_quantity * row['harga']
-                else:
-                    session['cart_item'] = array_merge(session['cart_item'], itemQuery)
-            else:
-                session['cart_item'] = itemQuery
-                
-            return redirect(url_for('detail')) 
+    if 'loggedin' in session: 
+        pid = request.form['pid']
+        uid = session['id']
+        quantity = request.form['quantity']
+        if pid and quantity and uid and request.method == 'POST':
+            cur = mysql.connection.cursor()
+            cur.execute("CALL addcarts(%s,%s,%s)",(pid,uid,quantity,))
+            #cur.execute('INSERT INTO carts (product_id,user_id,quantity) VALUES (%s, %s,%s)',(pid,uid,quantity,))
+            cur.execute("UPDATE products SET stock=stock-%s WHERE pid = %s", (quantity,pid,))
+            #cur.execute("UPDATE carts SET total=(SELECT harga from products WHERE pid = %s)*%s WHERE user_id = %s", (pid,quantity,uid,))
+            mysql.connection.commit()
+            return redirect(url_for('home')) 
         else:
             return 'Error'
+            
     return redirect(url_for('login'))
 
 @app.route('/cart')
 def cart():
     if 'loggedin' in session:
-        all_total_price = 0
-        all_total_quantity = 0
-        session.modified = True
-        if 'cart_item' not in session:
-            return redirect(request.referrer)
-        elif 'cart_item' in session:
-            for key, value in session['cart_item'].items():
-                individual_quantity = int(session['cart_item'][key]['quantity'])
-                individual_price = float(session['cart_item'][key]['total_price'])
-                all_total_quantity = all_total_quantity + individual_quantity
-                all_total_price = all_total_price + individual_price
-        else:
-            session['all_total_quantity'] = all_total_quantity
-            session['all_total_price'] = all_total_price
-        return render_template("cart.html")
+        uid = session['id'] 
+        cur = mysql.connection.cursor() 
+        cur.execute("SELECT * FROM carts RIGHT JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid, ))
+        cart=cur.fetchall()
+        sum = mysql.connection.cursor() 
+        sum.execute("SELECT SUM(harga*quantity) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid, )) 
+        total=sum.fetchall()
+        print(total) 
+        return render_template('cart.html',cart=cart,total=total)
     return redirect(url_for('login'))
 
-@app.route('/updateCart/<id>', methods=["POST"])
-def updateCart(id):
-    if 'cart_item' not in session and len(session['cart_item']) <= 0:
-        return redirect(url_for('home'))
-    if request.method == "POST":
-        quantity = request.form['stock']
-        session.modified = True
-        for key, products in session['cart_item'].items():
-            if int(key) == id:
-                products['stock'] = quantity
-                return redirect(url_for('cart'))
+@app.route('/updateCart', methods=["POST"]) 
+def updateCart():
+    uid = session['id']
+    id = request.form['pid']
+    quantity = request.form['quantity']
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE products SET stock=stock-(%s-(SELECT quantity FROM carts WHERE user_id= %s and product_id = %s)) WHERE pid = %s", (quantity,uid,id,id,))
+    cur.execute("UPDATE carts SET quantity = %s WHERE product_id=(%s) and user_id = %s", (quantity, id, uid,))
+    mysql.connection.commit()
+    cur.close()
+    return redirect(url_for('cart'))
 
-@app.route('/deleteCart/<id>')
+@app.route('/deleteCart/<id>', methods = ['GET'])
 def deleteCart(id):
-    all_total_price = 0
-    all_total_quantity = 0
-    session.modified = True
-    for item in session['cart_item'].items():
-        if item[0] == id:    
-            session['cart_item'].pop(item[0], None)
-            if 'cart_item' in session:
-                for key, value in session['cart_item'].items():
-                    individual_quantity = int(session['cart_item'][key]['quantity'])
-                    individual_price = float(session['cart_item'][key]['total_price'])
-                    all_total_quantity = all_total_quantity + individual_quantity
-                    all_total_price = all_total_price + individual_price
-                break
-        if all_total_quantity == 0:
-            session.clear()
-        else:
-            session['all_total_quantity'] = all_total_quantity
-            session['all_total_price'] = all_total_price
-        return redirect(url_for('detail'))
+    if 'loggedin' in session:
+        uid = session['id']
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE products SET stock=stock+(SELECT quantity FROM carts WHERE user_id=%s and product_id=%s) WHERE pid = %s", (uid,id,id,))
+        cur.execute("DELETE FROM carts WHERE product_id=(%s) and user_id = %s", (id,uid))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('cart'))
+    return redirect(url_for('login')) 
 
 @app.route('/emptyCart')
 def emptyCart():

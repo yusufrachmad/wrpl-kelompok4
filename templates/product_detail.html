@@ -23,11 +23,12 @@
             </div>
             <div class="input-group">
                 <p>stok tersedia : {{ row.7 }}</p>
-                <form action="{{url_for('addToCart')}}" method="post">
-                    <input type="hidden" name="product_id" value="{{products.id}}">
-                    <label for="">Jumlah:</label>
-                    <input type="number" name="quantity" id="" value="1" min="1" max="{{ row.7 }}">
-                    <button type="submit" class="btn btn-sm btw-secondary">Add to Cart</button>
+                <form method="post" action="{{url_for('addToCart')}}">
+                    <div class="add-to-cart">
+                        <input type="hidden" name="pid" value="{{ row.0 }}"/>
+                        <input type="number" name="quantity" class="product-quantity" id="" value="1" min="0" max="{{ row.7 }}">
+                        <input type="submit" value="Add to Cart" class="default-btn" />
+                      </div>
                 </form>
 
 
