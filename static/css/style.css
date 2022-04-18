@@ -20,6 +20,7 @@
     width: 200px;
     height: 300px;
     margin: 5px;
+    margin-bottom: 65px;
 }
  
 .list-produk:hover
@@ -265,6 +266,11 @@ input[type="number"] {
 }
 
 /* Cart Kalo ga perlu hapus aja :v */
+.imgcart {
+  width: 30%;
+  height: 30%;
+}
+
 .pt-100 {
   padding-top: 100px;
 }
@@ -388,7 +394,7 @@ input[type="number"] {
   text-align: center;
   -webkit-transform: scale(.7);
   transform: scale(.7);
-  height: 105px;
+  height: 20px;
   -moz-transition: .4s;
   -webkit-transition: .4s;
   transition: .4s;
@@ -400,17 +406,17 @@ input[type="number"] {
   opacity: 1;
 }
 .single-publication .add-to-cart .default-btn {
-  margin-top: 28px;
-  padding: 8px 25px;
-  font-size: 14px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-size: 6px;
 }
 .single-publication .category {
   margin: 0;
 }
 .single-publication .add-to-cart .default-btn {
-  margin-top: 28px;
-  padding: 8px 25px;
-  font-size: 14px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-size: 6px;
 }
 .default-btn {
   background-color: #ff007d;

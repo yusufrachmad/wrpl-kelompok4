@@ -4,66 +4,138 @@
 
 {% block body %}
 
-{% if 'cart_item' in session %}
-<p><a id="btnEmpty" href="{{ url_for('/empty_cart') }}" class="btn btn-danger">Empty Cart</a></p>
-         <table class="table table-hover">
-             <thead>
-                 <tr>
-                     <th>Product</th>
-                     <th>Quantity</th>
-                     <th class="text-center">Unit Price</th>
-                     <th class="text-center">Price</th>
-                     <th> </th>
-                 </tr>
-             </thead>
-             <tbody>
- {% for key, val in session['cart_item'].items() %}
-  {% set quantity = session['cart_item'][key]['quantity'] %}
-  {% set harga = session['cart_item'][key]['harga'] %}
-  {% set item_price = session['cart_item'][key]['total_price'] %} 
-                 <tr>
-                     <td class="col-sm-8 col-md-6">
-                     <div class="media">
-                         <a class="thumbnail pull-left" href="#"> <img class="media-object" src="/static/images/product-images/{{ session['cart_item'][key]['image'] }}" style="width: 72px; height: 72px;"> </a>
-                         <div class="media-body">
-                             <h4 class="media-heading"> <a href="#">{{ session['cart_item'][key]['name'] }}</a></h4>
-                             <h5 class="media-heading"> by <a href="#">Brand name</a></h5>
-                             <span>Status: </span><span class="text-success"><strong>In Stock</strong></span>
-                         </div>
-                     </div></td>
-                     <td class="col-sm-1 col-md-1" style="text-align: center">
-                     <input type="email" class="form-control" value="{{ quantity }}">
-                     </td>
-                     <td class="col-sm-1 col-md-1 text-center"><strong>${{ harga }} </strong></td>
-                     <td class="col-sm-1 col-md-1 text-center"><strong>${{ item_price }} </strong></td>
-                     <td class="col-sm-1 col-md-1">
-                     <a href="{{ url_for('.delete_product', code=session['cart_item'][key]['code']) }}" class="btn btn-danger">
-                         <span class="glyphicon glyphicon-remove"></span> Remove
-                     </a></td>
-                 </tr>
- {% endfor %}
-                 <tr>
-                     <td colspan="4"><h5>Total Quantity</h5></td>
-                     <td class="text-right"><h5><strong>{{ session['all_total_quantity'] }}</strong></h5></td>
-                 </tr>
-                 <tr>
-                     <td colspan="3"><h3>Total</h3></td>
-                     <td colspan="2" class="text-right"><h3><strong>$ {{ session['all_total_price'] }}</strong></h3></td>
-                 </tr>
-                 <tr>
-                     <td colspan="4">
-                     <button type="button" class="btn btn-default">
-                         <span class="glyphicon glyphicon-shopping-cart"></span> Continue Shopping
-                     </button></td>
-                     <td>
-                     <button type="button" class="btn btn-success">
-                         Checkout <span class="glyphicon glyphicon-play"></span>
-                     </button></td>
-                 </tr>
-             </tbody>
-         </table>
-{% else: %}
-<div class="no-records">Your Cart is Empty</div>
-{% endif %}
+  <div class="container">
+    <div class="starter-template">
+    <h1>Keranjangku</h1>
+    <table class="table table-striped">
+    <thead>
+    <tr>
+    <td>Nama</td>
+    <td>Jumlah</td> 
+    <td>Harga</td> 
+    <td>Gambar</td>
+    <td>Aksi</td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in cart %}
+    <tr>
+    <td>{{ row.5 }}</td>
+    <td>{{ row.3 }}</td>
+    <td>{{ row.7 }}</td>
+    <td><img c class="imgcart" src="{{row.8}}" alt="produk"></td>
+    <td>
+    <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.1 }}">Edit</a>
+    <a href="/deleteCart/{{ row.1 }}" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
+   
+   
+    </td>
+   
+   
+    </tr>
+
+    
+   
+    <div id="modalEdit{{ row.1 }}" class="modal fade" role="dialog">
+
+
+        <div class="modal-dialog">
+       
+       
+        <div class="modal-content">
+       
+       
+        <div class="modal-header">
+       
+       
+        <button type="button" class="close" style="top: ;" data-dismiss="modal">&times;</button>
+       
+       
+        <h4 class="modal-title">Edit Data</h4>
+       
+       
+        </div>
+       
+       
+        <div class="modal-body">
+       
+       
+        <form action="{{ url_for('updateCart') }}" method="POST" enctype="multipart/form-data">
+       
+       
+        <div class="form-group">
+       
+       
+        <label>Jumlah:</label>
+        <input type="hidden" name="pid" value="{{ row.1 }}">
+        <input type="number" class="form-control" name="quantity" value="{{ row.3 }}"> 
+       
+       
+       
+        <div class="form-group">
+       
+       
+        <button class="btn btn-warning" type="submit">Update</button>
+       
+       
+        </div>
+       
+       
+        </form>
+       
+       
+        </div>
+       
+       
+        <div class="modal-footer">
+       
+       
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+       
+       
+        </div>
+       
+       
+        </div>
+       
+       
+        </div>
+       
+       
+        </div>
+       
+    
+   {% else %}
+   
+   
+   <div class="no-records"><h4>Your Cart is Empty</h4></div>
+   
+   
+   {% endfor %}
+   
+   
+    </tbody>
+   
+   
+    </table>
+    <div class="container">
+      <h4>Total Harga : {{ total }} </h4>
+    </div>
+   
+    <div class="container">
+      <a href="#" class="btn btn-success">CheckOut</a>
+    </div>
+
+    </div>
+   
+   
+   
+   
+   </div>
+   
+   
+   
+   
+   
 
 {% endblock %}
