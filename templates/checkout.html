@@ -4,6 +4,126 @@
 
 {% block body %}
 
+<div class="container">
+    <div class="starter-template">
+    <h1>Pembayaran</h1>
+    <table class="table table-striped">
+    <thead>
+    <tr>
+    <td>Alamat Asal</td>
+    <td>Harga Total Barang</td> 
+    <td>Alamat Tujuan</td> 
+    <td>Ongkos Kirim</td>
+    <td>Jumlah Dibayarkan</td>
+    </tr>
+    </thead>
+    <tbody>
 
+    <tr>
+    <td>{{ row.5 }}</td>
+    <td>{{ row.3 }}</td>
+    <td>{{ row.7 }}</td>
+    <td><img c class="imgcart" src="{{row.8}}" alt="produk"></td>
+    <td>
+    <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.1 }}">Edit</a>
+    <a href="/deleteCart/{{ row.1 }}" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
+   
+   
+    </td>
+   
+   
+    </tr>
+
+    
+   
+    <div id="modalEdit{{ row.1 }}" class="modal fade" role="dialog">
+
+
+        <div class="modal-dialog">
+       
+       
+        <div class="modal-content">
+       
+       
+        <div class="modal-header">
+       
+       
+        <button type="button" class="close" style="top: ;" data-dismiss="modal">&times;</button>
+       
+       
+        <h4 class="modal-title">Edit Data</h4>
+       
+       
+        </div>
+       
+       
+        <div class="modal-body">
+       
+       
+        <form action="{{ url_for('updateCart') }}" method="POST" enctype="multipart/form-data">
+       
+       
+        <div class="form-group">
+       
+       
+        <label>Jumlah:</label>
+        <input type="hidden" name="pid" value="{{ row.1 }}">
+        <input type="number" class="form-control" name="quantity" value="{{ row.3 }}"> 
+       
+       
+       
+        <div class="form-group">
+       
+       
+        <button class="btn btn-warning" type="submit">Update</button>
+       
+       
+        </div>
+       
+       
+        </form>
+       
+       
+        </div>
+       
+       
+        <div class="modal-footer">
+       
+       
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+       
+       
+        </div>
+       
+       
+        </div>
+       
+       
+        </div>
+       
+       
+        </div>
+       
+
+   
+   
+    </tbody>
+   
+   
+    </table>
+   
+    <div class="container">
+      <a href="/checkout" class="btn btn-success">CheckOut</a>
+    </div>
+
+    </div>
+   
+   
+   
+   
+   </div>
+   
+   
+   
 
 {% endblock %}
