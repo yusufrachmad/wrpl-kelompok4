@@ -6,15 +6,12 @@ import urllib.request
 import os
 import base64
 import requests
-import shippo
 from math import *
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'static/uploads/'
 ALLOWED_EXTENSIONS = set(['png','jpg','jpeg'])
-
-shippo.config.api_key= 'shippo_test_2845605548ab80ffe2adc5af39b62af53128a99e'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
