@@ -6,11 +6,15 @@ import urllib.request
 import os
 import base64
 import requests
+import shippo
+from math import *
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'static/uploads/'
 ALLOWED_EXTENSIONS = set(['png','jpg','jpeg'])
+
+shippo.config.api_key= 'shippo_test_2845605548ab80ffe2adc5af39b62af53128a99e'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -48,6 +52,22 @@ def uploadImage(image_file):
     except Exception as e:
         print(e)
         return None        
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    # haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    r = 6371 # Radius of earth in kilometers. Use 3956 for miles
+    return c * r #iki lih? iyoo lid, tak tonton ning gugel long lat jakarta
 
 @app.route('/')
 @app.route('/home')
@@ -263,7 +283,25 @@ def deleteCart(id):
 @app.route('/emptyCart')
 def emptyCart():
     session.clear()
-    return redirect(url_for('home'))
+    return redirect(url_for('home')) 
+
+@app.route('/checkout')
+def checkout():
+    uid = session['id']
+    lat1 = mysql.connection.cursor() 
+    lat1.execute("SELECT latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota WHERE uid=%s", (uid,)) 
+    lat_asal = lat1.fetchall()
+    lng1 = mysql.connection.cursor() 
+    lng1.execute("SELECT longitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota WHERE uid=%s", (uid,)) 
+    lng_asal = lng1.fetchall()
+    lat2 = mysql.connection.cursor() 
+    lat2.execute("SELECT latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts carts.user_id = accounts.uid WHERE user_id=%s", (uid,)) 
+    lat_tujuan = lat2.fetchall()
+    lng2 = mysql.connection.cursor() 
+    lng2.execute("SELECT * FROM carts WHERE user_id=%s", (uid,))  #semangat pak ketua, eh pak koor deng raenek
+    lng_tujuan = lng2.fetchall()
+    co = haversine(float(lng_asal), float(lat_asal), float(lng_tujuan), float(lat_tujuan))
+    return render_template('checkout.html',co=co) 
 
 @app.route('/about-us')
 def aboutUs():
