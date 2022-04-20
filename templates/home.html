@@ -23,7 +23,7 @@
   <a class="tombol-detail" href="/products/{{row.0}}">
     <img c src="{{ row.4 }}" alt="produk">
     <h5>{{row.1}}</h5>
-    <h6>Rp{{row.3}}</h6>
+    <h6>{{row.3 | rupiah}}</h6>
   </a>
     <!-- <form method="post" action="{{url_for('addToCart')}}">
       <div class="add-to-cart">
