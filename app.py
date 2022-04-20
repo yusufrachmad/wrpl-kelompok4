@@ -64,7 +64,7 @@ def haversine(lon1, lat1, lon2, lat2):
     a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
     c = 2 * asin(sqrt(a))
     r = 6371 # Radius of earth in kilometers. Use 3956 for miles
-    return c * r #iki lih? iyoo lid, tak tonton ning gugel long lat jakarta
+    return c * r 
 
 @app.route('/')
 @app.route('/home')
@@ -74,6 +74,14 @@ def home():
     data = cur.fetchall()
     cur.close()
     return render_template('home.html', products=data)
+
+@app.template_filter()
+def rupiah(value):
+    value = float(value)
+    x = "Rp{:,.2f}".format(value)
+    replaceRupiah = str(x).replace(',','.')
+    rupiah = replaceRupiah[:-3]
+    return rupiah
 
 @app.route('/all-product')
 def allproduct():
@@ -244,12 +252,11 @@ def cart():
     if 'loggedin' in session:
         uid = session['id'] 
         cur = mysql.connection.cursor() 
-        cur.execute("SELECT * FROM carts RIGHT JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid, ))
+        cur.execute("SELECT * FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid, ))
         cart=cur.fetchall()
         sum = mysql.connection.cursor() 
-        sum.execute("SELECT SUM(harga*quantity) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid, )) 
-        total=sum.fetchall()
-        print(total) 
+        sum.execute("SELECT SUM(harga*quantity) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid,)) 
+        total = sum.fetchone()
         return render_template('cart.html',cart=cart,total=total)
     return redirect(url_for('login'))
 
@@ -258,9 +265,11 @@ def updateCart():
     uid = session['id']
     id = request.form['pid']
     quantity = request.form['quantity']
+    id_kurir = request.form['kurir'] 
     cur = mysql.connection.cursor()
     cur.execute("UPDATE products SET stock=stock-(%s-(SELECT quantity FROM carts WHERE user_id= %s and product_id = %s)) WHERE pid = %s", (quantity,uid,id,id,))
     cur.execute("UPDATE carts SET quantity = %s WHERE product_id=(%s) and user_id = %s", (quantity, id, uid,))
+    cur.execute("UPDATE carts SET kurir_id=%s WHERE user_id = %s AND product_id = %s", (id_kurir,uid,id,))
     mysql.connection.commit()
     cur.close()
     return redirect(url_for('cart'))
@@ -278,27 +287,70 @@ def deleteCart(id):
     return redirect(url_for('login')) 
 
 @app.route('/emptyCart')
-def emptyCart():
+def emptyCart(): #Assalamu'alaikum
     session.clear()
     return redirect(url_for('home')) 
 
 @app.route('/checkout')
 def checkout():
+    uid = session['id'] 
+    cur = mysql.connection.cursor()
+    #cur.execute('SELECT * FROM products JOIN accounts ON accounts.uid = products.user_id JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.user_id=%s', (uid,))
+    cur.execute('SELECT * FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid JOIN products ON products.pid = carts.product_id JOIN couriers ON couriers.kid = carts.kurir_id WHERE carts.user_id=%s', (uid,))
+    checkout = cur.fetchall()
+    sum = mysql.connection.cursor() 
+    sum.execute("SELECT SUM(harga*quantity+ongkir) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid,)) 
+    total = sum.fetchone()
+    jumlah_ongkir = mysql.connection.cursor()
+    return render_template('checkout.html', checkout=checkout, total=total)
+
+@app.route('/updateKurir', methods = ['POST'])
+def updatekurir():
     uid = session['id']
+    pid = request.form['pid'] 
+    id_kurir = request.form['kurir']
+    print(request.form)
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE carts SET kurir_id=%s WHERE user_id = %s AND product_id = %s", (id_kurir,uid,pid,))
+    mysql.connection.commit()
     lat1 = mysql.connection.cursor() 
-    lat1.execute("SELECT latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota WHERE uid=%s", (uid,)) 
-    lat_asal = lat1.fetchall()
+    lat1.execute("SELECT detail_kota.latitude FROM products JOIN accounts ON accounts.uid = products.user_id JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.pid = %s", (pid,)) 
+    lat_asal = lat1.fetchone()
+    print(lat_asal)
     lng1 = mysql.connection.cursor() 
-    lng1.execute("SELECT longitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota WHERE uid=%s", (uid,)) 
-    lng_asal = lng1.fetchall()
+    lng1.execute("SELECT detail_kota.longitude FROM products JOIN accounts ON accounts.uid = products.user_id JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.pid = %s", (pid,)) 
+    lng_asal = lng1.fetchone()
+    print(lng_asal)
     lat2 = mysql.connection.cursor() 
-    lat2.execute("SELECT latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts carts.user_id = accounts.uid WHERE user_id=%s", (uid,)) 
-    lat_tujuan = lat2.fetchall()
+    lat2.execute("SELECT detail_kota.latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid WHERE user_id=%s", (uid,)) 
+    lat_tujuan = lat2.fetchone()
+    print(lat_tujuan)
     lng2 = mysql.connection.cursor() 
-    lng2.execute("SELECT * FROM carts WHERE user_id=%s", (uid,))  #semangat pak ketua, eh pak koor deng raenek
-    lng_tujuan = lng2.fetchall()
-    co = haversine(float(lng_asal), float(lat_asal), float(lng_tujuan), float(lat_tujuan))
-    return render_template('checkout.html',co=co) 
+    lng2.execute("SELECT detail_kota.longitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid WHERE user_id=%s", (uid,)) #halo lih
+    lng_tujuan = lng2.fetchone()
+    print(lng_tujuan)
+    kur = mysql.connection.cursor() 
+    kur.execute("SELECT kurir_id FROM carts WHERE user_id=%s and product_id=%s", (uid,pid,)) 
+    kurir = kur.fetchone()
+    co = haversine(float(lng_asal[0]), float(lat_asal[0]), float(lng_tujuan[0]), float(lat_tujuan[0]))
+    print(kurir)
+    print(co)
+    if (kurir[0] == 1): 
+        ongkos_kirim = 1750 + (co * 200) 
+        ongkir = round(ongkos_kirim, -3)
+    elif (kurir[0] == 2): 
+        ongkos_kirim = 2300 + (co * 160) 
+        ongkir = round(ongkos_kirim, -3)
+    elif (kurir[0] == 3):
+        ongkos_kirim = 3000 + (co * 100) 
+        ongkir = round(ongkos_kirim, -3)
+    fee = mysql.connection.cursor()
+    fee.execute("UPDATE carts SET ongkir = %s WHERE user_id =%s and product_id = %s", (ongkir,uid,pid,))
+    mysql.connection.commit()
+    fee_ongkir = mysql.connection.cursor()
+    fee_ongkir.execute("SELECT ongkir FROM carts WHERE user_id =%s and product_id = %s", (uid,pid,))
+    tampil_fee = fee_ongkir.fetchone()
+    return redirect(url_for('checkout', ongkir=ongkir, tampil_fee=tampil_fee)) 
 
 @app.route('/about-us')
 def aboutUs():

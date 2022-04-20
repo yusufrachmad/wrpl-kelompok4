@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% block title %} Produk Detail {% endblock %}
+{% block title %} Checkout {% endblock %}
 
 {% block body %}
 
@@ -10,100 +10,106 @@
     <table class="table table-striped">
     <thead>
     <tr>
-    <td>Alamat Asal</td>
-    <td>Harga Total Barang</td> 
-    <td>Alamat Tujuan</td> 
-    <td>Ongkos Kirim</td>
-    <td>Jumlah Dibayarkan</td>
+    <td>Alamat Tujuan</td>
+    <!-- <td>Harga Total Barang</td> -->
+    <td>Pilih Ekspedisi</td>
+    <td></td>
+    <td>Ongkir</td>
     </tr>
     </thead>
     <tbody>
-
+    {% for row in checkout %}
     <tr>
-    <td>{{ row.5 }}</td>
-    <td>{{ row.3 }}</td>
-    <td>{{ row.7 }}</td>
-    <td><img c class="imgcart" src="{{row.8}}" alt="produk"></td>
-    <td>
-    <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.1 }}">Edit</a>
-    <a href="/deleteCart/{{ row.1 }}" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
-   
-   
-    </td>
-   
+    <!-- <input type="hidden" name="pid" value="{{ row.0 }}"> -->
+    <td>{{ row.0 }}</td> 
+    <!-- <td>{{ total[0] | rupiah }}</td> -->
+    <td><a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.10 }}">Kurir</a></td>
+    <td>{{ row.24 }}</td>   
+    <td>{{ row.14 | rupiah}}</td>
+    
    
     </tr>
 
-    
-   
-    <div id="modalEdit{{ row.1 }}" class="modal fade" role="dialog">
+    <div id="modalEdit{{ row.10 }}" class="modal fade" role="dialog">
 
 
-        <div class="modal-dialog">
-       
-       
-        <div class="modal-content">
-       
-       
-        <div class="modal-header">
-       
-       
-        <button type="button" class="close" style="top: ;" data-dismiss="modal">&times;</button>
-       
-       
-        <h4 class="modal-title">Edit Data</h4>
-       
-       
-        </div>
-       
-       
-        <div class="modal-body">
-       
-       
-        <form action="{{ url_for('updateCart') }}" method="POST" enctype="multipart/form-data">
-       
-       
-        <div class="form-group">
-       
-       
-        <label>Jumlah:</label>
-        <input type="hidden" name="pid" value="{{ row.1 }}">
-        <input type="number" class="form-control" name="quantity" value="{{ row.3 }}"> 
-       
-       
-       
-        <div class="form-group">
-       
-       
-        <button class="btn btn-warning" type="submit">Update</button>
-       
-       
-        </div>
-       
-       
-        </form>
-       
-       
-        </div>
-       
-       
-        <div class="modal-footer">
-       
-       
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-       
-       
-        </div>
-       
-       
-        </div>
-       
-       
-        </div>
-       
-       
-        </div>
-       
+      <div class="modal-dialog">
+     
+     
+      <div class="modal-content">
+     
+     
+      <div class="modal-header">
+     
+     
+      <button type="button" class="close" style="top: ;" data-dismiss="modal">&times;</button>
+     
+     
+      <h4 class="modal-title">Ganti Kurir</h4>
+     
+     
+      </div>
+     
+     
+      <div class="modal-body">
+     
+     
+      <form action="{{ url_for('updatekurir') }}" method="POST" enctype="multipart/form-data">
+     
+     
+      <div class="form-group">
+     
+     
+      <label>Kurir:</label>
+      <input type="hidden" name="pid" value="{{ row.10 }}">
+      <input type="hidden">
+      <select name="kurir">
+        <option value='1'>JNE</option>
+        <option value='2'>JNT</option>
+        <option value='3'>Bukapee</option>
+      </select>
+
+      <!-- <div class="form-group">
+        <label>Ongkir:</label>
+      </div> -->
+
+      <!-- <div class="form-group">
+        <label>Total Pembayaran: {{ total[0] | rupiah }}</label>
+      </div> -->
+     
+      <div class="form-group">
+     
+     
+      <button class="btn btn-warning" type="submit">SELECT</button>
+     
+     
+      </div>
+     
+     
+      </form>
+     
+     
+      </div>
+     
+     
+      <div class="modal-footer">
+     
+     
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+     
+     
+      </div>
+     
+     
+      </div>
+     
+     
+      </div>
+     
+     
+      </div> 
+      
+    {% endfor %}
 
    
    
@@ -111,9 +117,13 @@
    
    
     </table>
+
+    <div class="container">
+      <h4>Total Pembayaran : {{ total[0] | rupiah }} </h4> 
+    </div>
    
     <div class="container">
-      <a href="/checkout" class="btn btn-success">CheckOut</a>
+      <a href="/bayar" class="btn btn-success">Bayar</a>
     </div>
 
     </div>
