@@ -24,9 +24,12 @@
     <td>{{ row.0 }}</td> 
     <!-- <td>{{ total[0] | rupiah }}</td> -->
     <td><a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.10 }}">Kurir</a></td>
-    <td>{{ row.24 }}</td>   
+    <td>{{ row.24 }}</td>
+    {% if row.14 == NULL %}   
+    <td>Belum pilih kurir</td>
+    {% else %}
     <td>{{ row.14 | rupiah}}</td>
-    
+    {% endif %}
    
     </tr>
 
