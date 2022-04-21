@@ -29,9 +29,9 @@
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-1">Kota</div>
+    <div class="col-1">Alamat</div>
     <div class="col-md-auto">:</div>
-    <div class="col-3">{{ user['kota'] }}</div>
+    <div class="col-3">{{ user['alamat'] }}, {{ user['kodepos'] }},{{ user['kota'] }}</div>
   </div>
 
   <div class="row justify-content-center" style="margin-top: 30px; margin-bottom: 40px;">
@@ -64,7 +64,25 @@
            <label>New Password:</label>
             <input type="password" class="form-control" name="password">
           </div>
-      
+          
+          <div class="form-group" style="text-align: left;">
+            <label>Old Alamat: {{ user['alamat'] }}</label>
+            <p>New Alamat</p>
+             <input type="text" class="form-control" name="alamat">
+          </div>
+
+          <div class="form-group" style="text-align: left;">
+            <label>Old Email: {{ user['kodepos'] }}</label>
+            <p>New Kode Pos</p>
+             <input type="text" class="form-control" name="kodepos">
+          </div>
+
+          <div class="form-group" style="text-align: left;">
+            <label>Old Email: {{ user['kota'] }}</label>
+            <p>New Email</p>
+             <input type="text" class="form-control" name="kota">
+          </div>
+
           <div class="form-group">
            <button class="btn btn-primary">Update</button>
           </div>

@@ -66,6 +66,18 @@ def haversine(lon1, lat1, lon2, lat2):
     r = 6371 # Radius of earth in kilometers. Use 3956 for miles
     return c * r 
 
+def getOngkir(kode, jarak, initial_price):
+    if (kode == 1): 
+        ongkos_kirim = initial_price + (jarak * 200)  
+        ongkir = round(ongkos_kirim, -3)
+    elif (kode == 2): 
+        ongkos_kirim = initial_price + (jarak * 160) 
+        ongkir = round(ongkos_kirim, -3)
+    elif (kode == 3):
+        ongkos_kirim = initial_price + (jarak * 100) 
+        ongkir = round(ongkos_kirim, -3)
+    return ongkir
+
 @app.route('/')
 @app.route('/home')
 def home():
@@ -163,10 +175,13 @@ def update():
             username = request.form['name']
             email = request.form['email']
             password = request.form['password'].encode('utf-8')
+            alamat = request.form['alamat']
+            kodepos = request.form['kodepos']
+            kota = request.form['kota']
             hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute("UPDATE accounts SET name =% s, email =% s, password =% s  WHERE id=%s",(username,email,hash_password,(session['id'], ),))
+            cursor.execute("UPDATE accounts SET name =% s, email =% s, password =%s, alamat=%s, kodepos=%s, kota=%s  WHERE uid=%s",(username,email,hash_password,alamat,kodepos,kota,(session['id'], ),))
             mysql.connection.commit()
             return redirect(url_for('profile'))
     return redirect(url_for('login'))
@@ -332,18 +347,13 @@ def updatekurir():
     kur = mysql.connection.cursor() 
     kur.execute("SELECT kurir_id FROM carts WHERE user_id=%s and product_id=%s", (uid,pid,)) 
     kurir = kur.fetchone()
+    price = mysql.connection.cursor() 
+    price.execute("SELECT harga_awal FROM carts JOIN couriers ON couriers.kid = carts.kurir_id WHERE user_id=%s and product_id=%s", (uid,pid,)) 
+    harga_awal = price.fetchone()
     co = haversine(float(lng_asal[0]), float(lat_asal[0]), float(lng_tujuan[0]), float(lat_tujuan[0]))
     print(kurir)
     print(co)
-    if (kurir[0] == 1): 
-        ongkos_kirim = 1750 + (co * 200) 
-        ongkir = round(ongkos_kirim, -3)
-    elif (kurir[0] == 2): 
-        ongkos_kirim = 2300 + (co * 160) 
-        ongkir = round(ongkos_kirim, -3)
-    elif (kurir[0] == 3):
-        ongkos_kirim = 3000 + (co * 100) 
-        ongkir = round(ongkos_kirim, -3)
+    ongkir = getOngkir(kurir[0], co, harga_awal[0])
     fee = mysql.connection.cursor()
     fee.execute("UPDATE carts SET ongkir = %s WHERE user_id =%s and product_id = %s", (ongkir,uid,pid,))
     mysql.connection.commit()
