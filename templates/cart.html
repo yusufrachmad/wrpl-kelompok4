@@ -128,7 +128,11 @@
     </table>
 
     <div class="container">
-      <h4>Total Harga : {{ total[0] | rupiah }} </h4> 
+      {% if total[0] is none %}
+      <h4>Keranjang masih kosong</h4>
+      {% else %}
+      <h4>Total Pembayaran : {{ total[0] | rupiah }} </h4> 
+      {% endif %}
     </div>
   
     <div class="container">

@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block title %} Order Status {% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="starter-template">
+    <h1>Order Status</h1>
+    <table class="table table-striped">
+    <thead>
+    <tr>
+    <td>Nama</td>
+    <td>Jumlah</td>
+    <td>Harga</td> 
+    <td>Status</td> 
+    <td>Aksi</td> 
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in status %}
+    {% if row.3 != 'Paid/Finished' %}
+    <tr> 
+    <td>{{ row.0 }}</td>
+    <td>{{ row.1 }}</td>
+    <td>{{ row.2 | rupiah}}</td>
+    <td>{{ row.3 }}</td>
+    <td>
+        {% if row.3 == 'Unpaid' %}
+        <p>Barang belum dikirimkan oleh seller</p>
+        {% elif row.3 == 'Delivered' %}
+        <form action="{{ url_for('updateOrderStatusBuyer') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="product_id" value="{{ row.4 }}">
+        <input type="hidden" value="Finished" name="status">
+        <button class="btn btn-warning" type="submit">Accepted</button>
+        </form>
+        {% endif %}
+    </td>
+    </tr>
+    {% endif %}
+    
+   
+
+   {% else %}
+   
+   
+   <div class="no-records"><h4>Oh NO! Belum Memiliki Pesanan</h4></div> 
+   
+   
+   {% endfor %}
+   
+   
+    </tbody>
+   
+   
+    </table>
+
+  
+    <div class="container">
+      <a href="{{ url_for('profile')}}" class="btn btn-success">Back</a>
+    </div>
+
+    </div>
+   
+   
+   
+   
+   </div>
+   
+   
+
+{% endblock %}
