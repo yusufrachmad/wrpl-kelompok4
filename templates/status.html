@@ -6,11 +6,15 @@
 
 <div class="container">
     <div class="starter-template">
-    <h1>Order Status</h1>
+      <div class="order_status">
+        <a class="btn btn-outline-success btn-lg active" href="/status"> Order Status </a>
+        <a class="btn btn-outline-success btn-lg" href="/finishedOrder"> Finished Order </a>
+      </div>
     <table class="table table-striped">
     <thead>
     <tr>
     <td>Nama</td>
+    <td>Gambar</td>
     <td>Jumlah</td>
     <td>Harga</td> 
     <td>Status</td> 
@@ -22,6 +26,7 @@
     {% if row.3 != 'Paid/Finished' %}
     <tr> 
     <td>{{ row.0 }}</td>
+    <td><img c src="{{row.5}}" alt="produk" width="125px"></td>
     <td>{{ row.1 }}</td>
     <td>{{ row.2 | rupiah}}</td>
     <td>{{ row.3 }}</td>

@@ -17,7 +17,7 @@
                 <div>
                     <h3><strong>{{row.1}}</strong></h3>
                 </div>
-                <p>Penjual: {{row.9}}</p>
+                <p>Penjual: {{row.10}}</p>
                 <p>Deskripsi: {{row.2}}</p>
                 <h3><strong>{{row.3 | rupiah}}</strong></h3>
             </div>
@@ -30,13 +30,24 @@
                         <input type="submit" value="Add to Cart" class="default-btn" />
                       </div>
                 </form>
-
+                
 
                 <!-- <input type="hidden" name="code" value="{{ products.stock }}"/>
                 <input type="number" step="1" max="" value="1" name="quantity" class="quantity-field" />
                 <a href="/products/addcart"><input type="submit" value="Add to Cart" class="default-btn" /></a> -->
             </div>
             <a class="tombol-back" href="/">Back</a>
+            {% if rating[0] is none %}
+            <div class="text-tengah"> 
+                <h3 style="margin: 0px; width: 679px"><img src="{{ url_for('static',filename='img/star.png') }}" class="rating-on-product" alt="rating"> 0/5.0</h3>
+                
+            </div>
+            {% else %}
+            <div class="text-tengah"> 
+                <h3 style="margin: 0px; width: 679px"><img src="{{ url_for('static',filename='img/star_fill.png') }}" class="rating-on-product" alt="rating"> {{rating[0] | rating_rapi}}/5.0</h3>
+                
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

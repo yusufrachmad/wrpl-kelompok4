@@ -31,9 +31,15 @@
   <div class="row justify-content-center">
     <div class="col-1">Alamat</div>
     <div class="col-md-auto">:</div>
-    <div class="col-3">{{ user['alamat'] }}, {{ user['kodepos'] }},{{ user['kota'] }}</div>
+    <div class="col-3">{{ user['alamat'] }}, {{ user['kodepos'] }}, {{ user['kota'] }}</div>
   </div>
 
+  <div class="row justify-content-center">
+    <div class="col-1">No Telp</div>
+    <div class="col-md-auto">:</div>
+    <div class="col-3">{{ user['notelp'] }}</div>
+  </div>
+  
   <div class="row justify-content-center" style="margin-top: 30px; margin-bottom: 40px;">
     <div class="col-md-auto"><a href="#popup" class="btn btn-warning">Edit Profile</a></div>
     <div class="col-md-auto"><a href="/user-product" class="btn btn-success">Product</a></div>
@@ -52,13 +58,13 @@
           <div class="form-group" style="text-align: left;">
            <label>Old Name: {{ user['name'] }}</label>
            <p>New Name:</p>
-            <input type="text" class="form-control" name="name">
+            <input type="text" class="form-control" name="name" value="{{ user['name'] }}">
           </div>
       
           <div class="form-group" style="text-align: left;">
            <label>Old Email: {{ user['email'] }}</label>
            <p>New Email</p>
-            <input type="email" class="form-control" name="email">
+            <input type="email" class="form-control" name="email" value="{{ user['email'] }}">
           </div>
       
           <div class="form-group" style="text-align: left;">
@@ -69,19 +75,19 @@
           <div class="form-group" style="text-align: left;">
             <label>Old Address: {{ user['alamat'] }}</label>
             <p>New Address</p>
-             <input type="text" class="form-control" name="alamat">
+             <input type="text" class="form-control" name="alamat" value="{{ user['alamat'] }}">
           </div>
 
           <div class="form-group" style="text-align: left;">
             <label>Old Postal Code: {{ user['kodepos'] }}</label>
             <p>New Postal Code</p>
-             <input type="text" class="form-control" name="kodepos">
+             <input type="text" class="form-control" name="kodepos" value="{{ user['kodepos'] }}">
           </div>
 
           <div class="form-group" style="text-align: left;">
             <label>Old City: {{ user['kota'] }}</label>
             <p>New City</p>
-             <input type="text" class="form-control" name="kota">
+             <input type="text" class="form-control" name="kota" value="{{ user['kota'] }}"> 
           </div>
 
           <div class="form-group">

@@ -6,6 +6,7 @@ import urllib.request
 import os
 import base64
 import requests
+import json
 from math import *
 
 app = Flask(__name__)
@@ -85,17 +86,25 @@ def rupiah(value):
     replaceRupiah = str(x).replace(',','.')
     rupiah = replaceRupiah[:-3]
     return rupiah
-#wis lah keri ae, sik dinggo ssk sik ae lur
-#di total kabeh ae sisan :v, nek ning shopee per barang lih
+
+@app.template_filter() #woakwaokwaok asem, kok 4 tok
+def rating_rapi(value):
+    value = float(value)
+    x = "{:,.2f}".format(value)
+    replaceRupiah = str(x)
+    rating = replaceRupiah[:-1]
+    return rating
+
 app.template_filter()
 def qty():
     if 'loggedin' in session:
         uid = session['id'] 
         sum = mysql.connection.cursor() 
-        sum.execute("SELECT SUM(quantity) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid,)) 
+        sum.execute("SELECT COUNT(*) FROM carts WHERE carts.user_id=%s", (uid,)) 
         sum.fetchone()
-        return qty
-    return redirect(url_for('home'))
+        print(sum)
+        return sum
+    return redirect(url_for('home'), sum=sum)
 
 @app.route('/')
 @app.route('/home')
@@ -116,11 +125,14 @@ def allproduct():
 
 @app.route('/products/<id>')
 def detail(id):
+    uid = session['id']
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM products JOIN accounts ON products.user_id = accounts.uid WHERE products.pid=%s", (id,))
     data = cur.fetchall()
-    cur.close()
-    return render_template('product_detail.html', products=data)
+    nilai = mysql.connection.cursor()
+    nilai.execute("SELECT SUM(rating)/COUNT(*) FROM log_order WHERE rating AND product_id=%s", (id,))
+    rating = nilai.fetchone()
+    return render_template('product_detail.html', products=data, rating=rating)
 
 @app.route('/login',methods=["GET","POST"])
 def login():
@@ -161,10 +173,14 @@ def register():
         email = request.form['email']
         password = request.form['password'].encode('utf-8')
         hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
+        alamat = request.form['alamat']
+        kota = request.form['kota']
+        kodepos = request.form['kodepos']
+        notelp = request.form['notelp']
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO accounts (name, email, password) VALUES (%s,%s,%s)",(nama,email,hash_password,))
-        mysql.connection.commit() #meh pie yoo
+        cur.execute("INSERT INTO accounts (name, email, password, alamat, kota, kodepos, notelp) VALUES (%s,%s,%s)",(nama,email,hash_password, alamat, kota, kodepos, notelp,))
+        mysql.connection.commit() 
         return redirect(url_for('login'))
         
 @app.route('/profile', methods=["GET", "POST"])
@@ -369,6 +385,13 @@ def updatekurir():
     fee.execute("UPDATE carts SET ongkir = %s WHERE user_id =%s and product_id = %s", (ongkir,uid,pid,))
     fee.execute("CALL addorderdetails(%s,%s,%s,%s,%s)", (pid,uid,id_kurir,total_harga[0],jumlah_barang[0],))
     mysql.connection.commit()
+    mus = mysql.connection.cursor() 
+    mus.execute("SELECT SUM(harga*quantity+ongkir) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid,)) 
+    harga_total = mus.fetchone()
+    print(harga_total[0])
+    end = mysql.connection.cursor()
+    end.execute("UPDATE orderdetails SET total=%s WHERE user_id=%s and product_id = %s", (harga_total[0],uid,pid,))
+    mysql.connection.commit()
     fee_ongkir = mysql.connection.cursor()
     fee_ongkir.execute("SELECT ongkir FROM carts WHERE user_id =%s and product_id = %s", (uid,pid,))
     tampil_fee = fee_ongkir.fetchone()
@@ -388,7 +411,7 @@ def bayar():
 def status():
     uid = session['id']
     cur = mysql.connection.cursor() 
-    cur.execute("SELECT nama, jumlah, total, status, orderdetails.product_id FROM orderdetails JOIN products ON orderdetails.product_id=products.pid WHERE orderdetails.user_id=%s", (uid,))
+    cur.execute("SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails JOIN products ON orderdetails.product_id=products.pid WHERE orderdetails.user_id=%s", (uid,))
     status = cur.fetchall()
     cur.close()
     return render_template('status.html', status=status)
@@ -399,6 +422,7 @@ def updateOrderStatusBuyer():
     pid = request.form['product_id']
     cur = mysql.connection.cursor()
     cur.execute("UPDATE orderdetails SET status='Paid/Finished' WHERE user_id=%s and product_id=%s", (uid,pid,))
+    cur.execute("DELETE FROM orderdetails WHERE status='Paid/Finished' and user_id=%s and product_id=%s", (uid,pid,))
     mysql.connection.commit()
     cur.close()
     return redirect(url_for('status'))
@@ -421,6 +445,45 @@ def updateOrderStatusSeller():
     mysql.connection.commit()
     cur.close()
     return redirect(url_for('orderStatusSeller'))
+
+@app.route('/finishedOrder')
+def finishedOrder():
+    uid = session['id']
+    cur = mysql.connection.cursor() 
+    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE log_order.user_id=%s Order BY log_order.tanggal DESC", (uid,))
+    finish = cur.fetchall()
+    cur.close()
+    return render_template('finished-order.html', status=finish)
+
+@app.route('/rating', methods=['GET','POST'])
+def rating():
+    if request.method == 'POST':
+        if 'rating' in request.form: 
+            uid = session['id']
+            pid = request.form['pid'] 
+            content = int(request.form['rating']) 
+            print(content)
+            print(request.form)
+            nilai = mysql.connection.cursor() 
+            nilai.execute("UPDATE log_order SET rating=%s WHERE product_id = %s AND user_id = %s", (content, pid, uid,))
+            mysql.connection.commit()
+            nilai.close()
+            # if content:
+            #     if content == 5: # iki
+            #         five_stars += 1 # nah loh :D
+            #     elif content == 4: # iki 
+            #         four_stars += 1
+            #     elif content == 3:
+            #         three_stars += 1
+            #     elif content == 2:
+            #         two_stars += 1                    
+            #     elif content == 1:
+            #         one_star += 1
+            #     count += 1
+            #     total += content
+            #     rating = float('{0:.1f}'.format(total/count))
+    return redirect(url_for('finishedOrder'))
+    # return render_template('finished-order.html', five_stars=ratingstore['five_stars'], four_stars=ratingstore['four_stars'], three_stars=ratingstore['three_stars'], two_stars=ratingstore['two_stars'], one_star=ratingstore['one_star'], count=ratingstore['count'], rating=ratingstore['rating'])
 
 @app.route('/about-us')
 def aboutUs():
