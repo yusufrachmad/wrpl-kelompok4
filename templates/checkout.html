@@ -22,17 +22,17 @@
     <tr>
     <!-- <input type="hidden" name="pid" value="{{ row.0 }}"> -->
     <td>{{ row.0 }}</td> 
-    <td><a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.14 }}">Kurir</a></td>
-    {% if row.16 == 0 %}   
+    <td><a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.15 }}">Kurir</a></td>
+    {% if row.17 == 0 %}   
     <td>Belum pilih kurir</td>
     {% else %}
-    <td>{{ row.26 }}</td>
-    <td>{{ row.16 | rupiah}}</td>
+    <td>{{ row.28 }}</td>
+    <td>{{ row.17 | rupiah}}</td>
     {% endif %}
    
     </tr>
 
-    <div id="modalEdit{{ row.14 }}" class="modal fade" role="dialog">
+    <div id="modalEdit{{ row.15 }}" class="modal fade" role="dialog">
 
 
       <div class="modal-dialog">
@@ -63,7 +63,7 @@
      
      
       <label>Kurir:</label>
-      <input type="hidden" name="pid" value="{{ row.12 }}">
+      <input type="hidden" name="pid" value="{{ row.13 }}">
       <input type="hidden">
       <select name="kurir">
         <option value='1'>JNE</option>
