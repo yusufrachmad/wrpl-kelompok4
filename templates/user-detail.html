@@ -4,99 +4,205 @@
 
 {% block body %}
 <div class="container justify-content-center text-center" style="margin-top: 50px;">
-  <div class="row justify-content-md-center">
+  <div class="row justify-content-md-left">
     <div class="col-md-auto">
-      <img src="{{ url_for('static',filename='img/profile.png')}}" alt="Photo Profile" class="rounded-circle" style="width: 225px; height: auto;">
+      {% if user['foto'] is none %}
+      <img src="{{ url_for('static',filename='img/profile.png')}}" alt="Photo Profile" class="rounded-circle" style="width: 405px; height: auto;">
+      {% else %}
+      <img src="{{ user['foto'] }}" alt="Photo Profile" class="rounded-circle" style="width: 405px; height: 405px; object-fit: cover;">
+      {% endif %}
     </div>
   </div>
 
-  <div class="row justify-content-md-center">
+  <div class="row justify-content-md-left">
     <div class="col-md-auto" style="margin-top: 35px; margin-bottom: 50px;">
-      <a href="#" class="btn btn-secondary">Ubah Foto Profil</a>
+      <a href="#foto" class="btn btn-pink" style="width: 217px;margin-left: 92px;border-radius: 13px;">Ubah Foto Profil</a>
+    </div>
+    <div class="col-md-auto" style="margin-top: 98px; margin-bottom: 50px;">
+      <a href="#password" class="btn btn-pink" style="width: 217px;margin-left: -277px;border-radius: 13px;">Ubah Password</a>
     </div>
   </div>
 
-  <div class="row justify-content-center">
-    <div class="col-1">Username</div>
-    <div class="col-md-auto">:</div>
-    <div class="col-3">{{ user['name'] }}</div>
+
+  <div class="container">
+    <div class="informasi">
+      <h5 style="margin-bottom: 26px;"><b>Nama</b></h5>
+      <h5 style="margin-bottom: 26px;"><b>Email</b></h5>
+      <h5 style="margin-bottom: 26px;"><b>No Telepon</b></h5>
+      <h5 style="margin-bottom: 26px;"><b>Alamat</b></h5>
+    </div>
+    <div class="informasi-user">
+      <h5 style="margin-bottom: 26px;"><b>{{ user['name'] }}</b><a href="#nama">Ubah</a></h5>
+      <h5 style="margin-bottom: 26px;"><b>{{ user['email'] }}</b><a href="#email">Ubah</a></h5>
+      <h5 style="margin-bottom: 26px;"><b>{{ user['notelp'] }}</b><a href="#notelp">Ubah</a></h5>
+      <h5 style="margin-bottom: 26px;"><b>{{ user['alamat'] }}, {{ user['kodepos'] }}, {{ user['kota'] }}</b><a href="#alamat">Ubah</a></h5>
+    </div>
   </div>
 
-  <div class="row justify-content-center">
-    <div class="col-1">Email</div>
-    <div class="col-md-auto">:</div>
-    <div class="col-3">{{ user['email'] }}</div>
-  </div>
-
-  <div class="row justify-content-center">
-    <div class="col-1">Alamat</div>
-    <div class="col-md-auto">:</div>
-    <div class="col-3">{{ user['alamat'] }}, {{ user['kodepos'] }}, {{ user['kota'] }}</div>
-  </div>
-
-  <div class="row justify-content-center">
-    <div class="col-1">No Telp</div>
-    <div class="col-md-auto">:</div>
-    <div class="col-3">{{ user['notelp'] }}</div>
-  </div>
   
-  <div class="row justify-content-center" style="margin-top: 30px; margin-bottom: 40px;">
+  <!-- <div class="row justify-content-center" style="margin-top: 30px; margin-bottom: 40px;">
     <div class="col-md-auto"><a href="#popup" class="btn btn-warning">Edit Profile</a></div>
-    <div class="col-md-auto"><a href="/user-product" class="btn btn-success">Product</a></div>
-    <div class="col-md-auto"><a href="/status" class="btn btn-info">Order Status</a></div>
-  </div>
+  </div> -->
 
-  <div id="popup">
-      <div class="window"> 
-          <a href="#" class="close-button" title="close">X</a>
-          <form action="{{ url_for('update') }}" method="POST">
-
-            <div class="form-group">
-                <h1>Edit Profile </h1>
-               </div>
-    
-          <div class="form-group" style="text-align: left;">
-           <label>Old Name: {{ user['name'] }}</label>
-           <p>New Name:</p>
-            <input type="text" class="form-control" name="name" value="{{ user['name'] }}">
-          </div>
-      
-          <div class="form-group" style="text-align: left;">
-           <label>Old Email: {{ user['email'] }}</label>
-           <p>New Email</p>
-            <input type="email" class="form-control" name="email" value="{{ user['email'] }}">
-          </div>
-      
-          <div class="form-group" style="text-align: left;">
-           <label>New Password:</label>
-            <input type="password" class="form-control" name="password">
-          </div>
-          
-          <div class="form-group" style="text-align: left;">
-            <label>Old Address: {{ user['alamat'] }}</label>
-            <p>New Address</p>
-             <input type="text" class="form-control" name="alamat" value="{{ user['alamat'] }}">
-          </div>
-
-          <div class="form-group" style="text-align: left;">
-            <label>Old Postal Code: {{ user['kodepos'] }}</label>
-            <p>New Postal Code</p>
-             <input type="text" class="form-control" name="kodepos" value="{{ user['kodepos'] }}">
-          </div>
-
-          <div class="form-group" style="text-align: left;">
-            <label>Old City: {{ user['kota'] }}</label>
-            <p>New City</p>
-             <input type="text" class="form-control" name="kota" value="{{ user['kota'] }}"> 
-          </div>
+  <div id="foto">
+    <div class="window"> 
+    <div class="modal-header">
+      <a class="close" style="top: ;" href="#">&times;</a>
+    </div>
+    <div class="modal-body"> 
+        <form action="{{ url_for('updateFoto') }}" method="POST" enctype="multipart/form-data"> <!--ditambahi enctype iki-->
 
           <div class="form-group">
-           <button class="btn btn-primary">Update</button>
+              <h1>Update Foto</h1>
           </div>
-      
-      
-        </form>
-      </div>
+  
+        <div class="form-group" style="text-align: left;">
+          <label>Gambar:</label>
+          <input type="file" class="form-control-file" name="foto" value="{{ user['foto'] }}">
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
+         </div>
+      </form>
+  </div>
+    </div>
+  </div>
+ 
+
+  <div id="password">
+    <div class="window"> 
+    <div class="modal-header">
+      <a class="close" style="top: ;" href="#">&times;</a>
+    </div>
+    <div class="modal-body"> 
+        <form action="{{ url_for('updatePassword') }}" method="POST" enctype="multipart/form-data"> <!--ditambahi enctype iki-->
+
+          <div class="form-group">
+              <h1>Update Password</h1>
+          </div>
+  
+        <div class="form-group" style="text-align: left;">
+          <label>Password:</label>
+          <input type="password" class="form-control-file" name="password" value="">
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
+         </div>
+      </form>
+  </div>
+    </div>
+  </div>
+
+  <div id="nama">
+    <div class="window"> 
+    <div class="modal-header">
+      <a class="close" style="top: ;" href="#">&times;</a>
+    </div>
+    <div class="modal-body"> 
+        <form action="{{ url_for('updateNama') }}" method="POST" enctype="multipart/form-data"> <!--ditambahi enctype iki-->
+
+          <div class="form-group">
+              <h1>Update Nama</h1>
+          </div>
+  
+        <div class="form-group" style="text-align: left;">
+          <label>Nama:</label>
+          <input type="text" class="form-control-file" name="name" value="{{ user['name'] }}">
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
+         </div>
+      </form>
+  </div>
+    </div>
+  </div>
+
+  <div id="email">
+    <div class="window"> 
+    <div class="modal-header">
+      <a class="close" style="top: ;" href="#">&times;</a>
+    </div>
+    <div class="modal-body"> 
+        <form action="{{ url_for('updateEmail') }}" method="POST" enctype="multipart/form-data"> <!--ditambahi enctype iki-->
+
+          <div class="form-group">
+              <h1>Update Email</h1>
+          </div>
+  
+        <div class="form-group" style="text-align: left;">
+          <label>Email:</label>
+          <input type="text" class="form-control-file" name="email" value="{{ user['email'] }}">
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
+         </div>
+      </form>
+  </div>
+    </div>
+  </div>
+
+  <div id="notelp">
+    <div class="window"> 
+    <div class="modal-header">
+      <a class="close" style="top: ;" href="#">&times;</a>
+    </div>
+    <div class="modal-body"> 
+        <form action="{{ url_for('updateNotelp') }}" method="POST" enctype="multipart/form-data"> <!--ditambahi enctype iki, nggo opo cuy-->
+
+          <div class="form-group">
+              <h1>Update No Telepon</h1>
+          </div>
+  
+        <div class="form-group" style="text-align: left;">
+          <label>No Telepon:</label>
+          <input type="text" class="form-control-file" name="notelp" value="{{ user['notelp'] }}">
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
+         </div>
+      </form>
+  </div>
+    </div>
+  </div>
+
+  <div id="alamat">
+    <div class="window"> 
+    <div class="modal-header">
+      <a class="close" style="top: ;" href="#">&times;</a>
+    </div>
+    <div class="modal-body"> 
+        <form action="{{ url_for('updateAlamat') }}" method="POST" enctype="multipart/form-data"> <!--ditambahi enctype iki-->
+
+          <div class="form-group">
+              <h1>Update Alamat</h1>
+          </div>
+  
+        <div class="form-group" style="text-align: left;">
+          <label>Alamat:</label>
+          <input type="text" class="form-control-file" name="alamat" value="{{ user['alamat'] }}">
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label>Kodepos:</label>
+          <input type="text" class="form-control-file" name="kodepos" value="{{ user['kodepos'] }}">
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label>Kota:</label>
+          <input type="text" class="form-control-file" name="kota" value="{{ user['kota'] }}">
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
+         </div>
+      </form>
+  </div>
+    </div>
   </div>
 
   </div>

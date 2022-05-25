@@ -125,13 +125,13 @@ def allproduct():
 
 @app.route('/products/<id>')
 def detail(id):
-    uid = session['id']
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM products JOIN accounts ON products.user_id = accounts.uid WHERE products.pid=%s", (id,))
     data = cur.fetchall()
     nilai = mysql.connection.cursor()
     nilai.execute("SELECT SUM(rating)/COUNT(*) FROM log_order WHERE rating AND product_id=%s", (id,))
     rating = nilai.fetchone()
+    
     return render_template('product_detail.html', products=data, rating=rating)
 
 @app.route('/login',methods=["GET","POST"])
@@ -193,22 +193,110 @@ def profile():
         return render_template('user-detail.html', user=user)
     return redirect(url_for('login'))    
 
-@app.route("/profile/edit", methods =['GET', 'POST'])
-def update():
+@app.route("/profile/edit/nama", methods =['GET', 'POST'])
+def updateNama():
     if 'loggedin' in session:
         if request.method == 'GET':
             return render_template("update.html")
         else:    
             username = request.form['name']
+            
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("UPDATE accounts SET name =% sWHERE uid=%s",(username,(session['id'], ),))
+            mysql.connection.commit()
+            return redirect(url_for('profile'))
+    return redirect(url_for('login'))
+
+# @app.route("/profile/edit", methods =['GET', 'POST'])
+# def update():
+#     if 'loggedin' in session:
+#         if request.method == 'GET':
+#             return render_template("update.html")
+#         else:    
+#             username = request.form['name']
+#             email = request.form['email']
+#             password = request.form['password'].encode('utf-8')
+#             alamat = request.form['alamat']
+#             kodepos = request.form['kodepos']
+#             kota = request.form['kota']
+#             hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
+
+#             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#             cursor.execute("UPDATE accounts SET name =% s, email =% s, password =%s, alamat=%s, kodepos=%s, kota=%s  WHERE uid=%s",(username,email,hash_password,alamat,kodepos,kota,(session['id'], ),))
+#             mysql.connection.commit()
+#             return redirect(url_for('profile'))
+#     return redirect(url_for('login'))
+
+@app.route("/profile/edit/email", methods =['GET', 'POST'])
+def updateEmail():
+    if 'loggedin' in session:
+        if request.method == 'GET':
+            return render_template("update.html")
+        else:    
             email = request.form['email']
-            password = request.form['password'].encode('utf-8')
+
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("UPDATE accounts SET email =% sWHERE uid=%s",(email,(session['id'], ),))
+            mysql.connection.commit()
+            return redirect(url_for('profile'))
+    return redirect(url_for('login'))
+
+@app.route("/profile/edit/notelp", methods =['GET', 'POST'])
+def updateNotelp():
+    if 'loggedin' in session:
+        if request.method == 'GET':
+            return render_template("update.html")
+        else:    
+            notelp = request.form['notelp']
+
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("UPDATE accounts SET notelp=%s WHERE uid=%s",(notelp,(session['id'], ),))
+            mysql.connection.commit()
+            return redirect(url_for('profile'))
+    return redirect(url_for('login'))
+
+@app.route("/profile/edit/alamat", methods =['GET', 'POST'])
+def updateAlamat():
+    if 'loggedin' in session:
+        if request.method == 'GET':
+            return render_template("update.html")
+        else:    
             alamat = request.form['alamat']
             kodepos = request.form['kodepos']
             kota = request.form['kota']
+
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("UPDATE accounts SET alamat=%s, kodepos=%s, kota=%s WHERE uid=%s",(alamat,kodepos,kota,(session['id'], ),))
+            mysql.connection.commit()
+            return redirect(url_for('profile'))
+    return redirect(url_for('login'))
+
+@app.route("/profile/edit/password", methods =['GET', 'POST'])
+def updatePassword():
+    if 'loggedin' in session:
+        if request.method == 'GET':
+            return render_template("update.html")
+        else:    
+            password = request.form['password'].encode('utf-8')
             hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute("UPDATE accounts SET name =% s, email =% s, password =%s, alamat=%s, kodepos=%s, kota=%s  WHERE uid=%s",(username,email,hash_password,alamat,kodepos,kota,(session['id'], ),))
+            cursor.execute("UPDATE accounts SET password =%sWHERE uid=%s",(hash_password,(session['id'], ),))
+            mysql.connection.commit()
+            return redirect(url_for('profile'))
+    return redirect(url_for('login'))
+
+@app.route('/profile/edit/foto', methods =['GET', 'POST'])
+def updateFoto():
+    if 'loggedin' in session:
+        if request.method == 'GET':
+            return render_template("update.html")
+        else:    
+            foto = uploadImage(request.files['foto'])
+            print(request)
+
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("UPDATE accounts SET foto = %s WHERE uid=%s",(foto,(session['id'], ),))
             mysql.connection.commit()
             return redirect(url_for('profile'))
     return redirect(url_for('login'))
@@ -450,7 +538,7 @@ def updateOrderStatusSeller():
 def finishedOrder():
     uid = session['id']
     cur = mysql.connection.cursor() 
-    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE log_order.user_id=%s Order BY log_order.tanggal DESC", (uid,))
+    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE log_order.user_id=%s OR products.user_id=%s Order BY log_order.tanggal DESC", (uid,uid,))
     finish = cur.fetchall()
     cur.close()
     return render_template('finished-order.html', status=finish)
@@ -462,28 +550,14 @@ def rating():
             uid = session['id']
             pid = request.form['pid'] 
             content = int(request.form['rating']) 
-            print(content)
-            print(request.form)
+            #print(content)
+            #print(request.form)
             nilai = mysql.connection.cursor() 
             nilai.execute("UPDATE log_order SET rating=%s WHERE product_id = %s AND user_id = %s", (content, pid, uid,))
+            nilai.execute("CALL update_rating()")
             mysql.connection.commit()
             nilai.close()
-            # if content:
-            #     if content == 5: # iki
-            #         five_stars += 1 # nah loh :D
-            #     elif content == 4: # iki 
-            #         four_stars += 1
-            #     elif content == 3:
-            #         three_stars += 1
-            #     elif content == 2:
-            #         two_stars += 1                    
-            #     elif content == 1:
-            #         one_star += 1
-            #     count += 1
-            #     total += content
-            #     rating = float('{0:.1f}'.format(total/count))
     return redirect(url_for('finishedOrder'))
-    # return render_template('finished-order.html', five_stars=ratingstore['five_stars'], four_stars=ratingstore['four_stars'], three_stars=ratingstore['three_stars'], two_stars=ratingstore['two_stars'], one_star=ratingstore['one_star'], count=ratingstore['count'], rating=ratingstore['rating'])
 
 @app.route('/about-us')
 def aboutUs():
