@@ -4,30 +4,23 @@
 
 {% block body %}
 
-  <div class="container">
+  <div class="container container-cart">
     <div class="starter-template">
-    <h1>Keranjangku</h1>
-    <table class="table table-striped">
-    <thead>
-    <tr>
-    <td>Nama</td>
-    <td>Jumlah</td> 
-    <td>Harga</td> 
-    <td>Gambar</td>
-    <td>Aksi</td>
-    </tr>
-    </thead>
+    <h3 style="color: #FFBAB3;">Keranjangku</h3>
+    <table class="table table-striped" style="position: absolute; width: 800px;">
     <tbody>
     {% for row in cart %}
     <tr>
-    <td>{{ row.7 }}</td>
-    <td>{{ row.4 }}</td>
-    <td>{{ row.9 | rupiah}}</td> <!---->
     <td><img c class="imgcart" src="{{row.10}}" alt="produk"></td>
+    <td><div class="nama-produk-cart"><b>{{ row.7 }}</b></div></td>
+    <td><div class="jumlah-produk-cart">Jumlah : {{ row.4 }}</div></td>
+    <td><div class="harga-produk-cart"><b>{{ row.9 | rupiah}}</b></div></td> 
+    <td><div class="garis-cart"></div></td>
     <td>
-    <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.1 }}">Edit</a>
+    <div class="aksi-produk-cart">
+    <a href="#!" class="btn btn-edit btn-xs" data-toggle="modal" data-target="#modalEdit{{ row.1 }}">Edit</a>
     <a href="/deleteCart/{{ row.1 }}" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
-   
+    </div>
    
     </td>
    
@@ -42,16 +35,13 @@
         <div class="modal-dialog">
        
        
-        <div class="modal-content">
+        <div class="modal-content" style="top: 134px; border-radius: 17px;background-color: #B8CDC4;">
        
        
         <div class="modal-header">
        
        
         <button type="button" class="close" style="top: ;" data-dismiss="modal">&times;</button>
-       
-       
-        <h4 class="modal-title">Edit Data</h4>
        
        
         </div>
@@ -66,24 +56,27 @@
         <div class="form-group">
        
        
-        <label>Jumlah:</label>
+        <label class="label-jumlah-cart"><b>Jumlah:</b></label>
         <input type="hidden" name="pid" value="{{ row.1 }}">
-        <input type="number" class="form-control" name="quantity" value="{{ row.4 }}"> 
+        <input type="number" class="form-control form-jumlah-cart" name="quantity" value="{{ row.4 }}"> 
+        </div>
 
-        <label>Kurir:</label>
+
+        <div class="form-group">
+        <label class="label-kurir-cart">Kurir:</label>
         <input type="hidden">
-        <select name="kurir">
+        <select  class="form-kurir-cart" name="kurir">
           <option value='1'>JNE</option>
           <option value='2'>JNT</option>
           <option value='3'>Bukapee</option>
         </select>
-       
+        </div>
        
        
         <div class="form-group">
        
        
-        <button class="btn btn-warning" type="submit">Update</button>
+        <button class="btn btn-warning" style="float: right;margin-right: 84px;border-color: #FFF0E1;background-color: #FFF0E1;" type="submit">Update</button>
        
        
         </div>
@@ -94,15 +87,9 @@
        
         </div>
        
-       
-        <div class="modal-footer">
-       
-       
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-       
-       
-        </div>
-       
+
+
+        
        
         </div>
        
@@ -127,17 +114,23 @@
    
     </table>
 
-    <div class="container">
+    <div class="background-total-bayar">
+    <div class="container total-bayar-cart">
       {% if total[0] is none %}
-      <h4>Keranjang masih kosong</h4>
+      <h5><b>Keranjang masih kosong</b></h5>
       {% else %}
-      <h4>Total Pembayaran : {{ total[0] | rupiah }} </h4> 
+      <h5><b>Total Pembayaran : {{ total[0] | rupiah }} </b></h5> 
       {% endif %}
     </div>
   
     <div class="container">
-      <a href="/checkout" class="btn btn-success">CheckOut</a>
+      <button onclick="location.href='/checkout'" class="button-pembayaran" type="button"><b>CheckOut</b></a>
     </div>
+
+    <div class="container">
+      <button onclick="location.href='/'" class="button-pembayaran-back" type="button"><b>Back</b></a>
+    </div>
+  </div>
 
     </div>
    
