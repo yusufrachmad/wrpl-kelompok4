@@ -13,17 +13,19 @@
         <a class="bukapee-navbar" href="/"><strong>Bukapee</strong><span class="sr-only">(current)</span></a>
       </li>
     </ul>
-
+    <!-- monggo mas aku ra reti -->
     <ul class="navbar-nav">
       {% if session['name'] %}
       <a class="cart-navbar" href="/cart"><img c src="static\img\cart.png" alt="cart" /></a>
       <li class="nav-item dropdown">
-        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> {{ session['name'] }} </a>
+        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-family: Monsterrat; font-weight: 700; font-size: larger">
+          {{ session['name'] }}
+        </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="/profile">See profile</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="/user-product">My Product</a>
-          <a class="dropdown-item" href="/status">Order Status</a>
+          <a class="dropdown-item" href="/user-product">Toko Saya</a>
+          <a class="dropdown-item" href="/status-unpaid">Pesanan Saya</a>
           <a class="dropdown-item" href="/logout">Logout</a>
         </div>
       </li>

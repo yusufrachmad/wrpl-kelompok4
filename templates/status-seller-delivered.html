@@ -1,0 +1,40 @@
+{% extends 'layout.html' %} {% block title %} Order Status {% endblock %} {% block body %}
+
+<div class="container">
+  <div class="starter-template" style="margin-top: 50px">
+    <a type="button" class="btn btn-outline-pink" style="width: 200px; height: 36px" href="/user-product">List Product</a>
+    <a type="button" class="btn btn-pink" style="width: 200px; height: 36px" href="/status-seller-unpaid">Order Status</a>
+    <div class="tab-order-status">
+      <a type="button" class="btn btn-line" href="/status-seller-unpaid">Belum Dikirimkan</a>
+      <a type="button" class="btn btn-line-now" href="/status-seller-delivered">Dikirimkan</a>
+      <a type="button" class="btn btn-line" href="/status-seller-finished">Selesai</a>
+    </div>
+    <table class="table table-striped" style="margin-top: 65px">
+      <tbody>
+        {% for row in status %}
+        <tr>
+          <td><img c src="{{row.5}}" style="width: 125px" alt="produk" /></td>
+          <td>
+            <div class="nama-produk-lp"><b>{{row.0}}</b></div>
+          </td>
+          <td><div class="jumlah-order-status">x{{ row.1 }}</div></td>
+          <td>
+            <div class="harga-order-status"><b>Total : {{ row.2 | rupiah}}</b></div>
+          </td>
+          <td>
+            <div class="status-order-status" style="margin-top: 27px"><b>{{ row.3 }}</b></div>
+          </td>
+          <td><div class="garis-status-seller"></div></td>
+        </tr>
+
+        {% else %}
+
+        <div class="no-records"><h4>Oh NO! Belum Memiliki Pesanan</h4></div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

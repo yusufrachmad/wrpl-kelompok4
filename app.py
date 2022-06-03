@@ -123,7 +123,7 @@ def allproduct():
     cur.close()
     return render_template('all-product.html', allproducts=data)
 
-@app.route('/products/<id>')
+@app.route('/products-<id>')
 def detail(id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM products JOIN accounts ON products.user_id = accounts.uid WHERE products.pid=%s", (id,))
@@ -180,7 +180,7 @@ def register():
 
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO accounts (name, email, password, alamat, kota, kodepos, notelp) VALUES (%s,%s,%s)",(nama,email,hash_password, alamat, kota, kodepos, notelp,))
-        mysql.connection.commit() 
+        mysql.connection.commit()
         return redirect(url_for('login'))
         
 @app.route('/profile', methods=["GET", "POST"])
@@ -371,7 +371,8 @@ def addToCart():
             cur.execute("UPDATE products SET stock=stock-%s WHERE pid = %s", (quantity,pid,))
             #cur.execute("UPDATE carts SET total=(SELECT harga from products WHERE pid = %s)*%s WHERE user_id = %s", (pid,quantity,uid,))
             mysql.connection.commit()
-            return redirect(url_for('home')) 
+            flash("Berhasil masuk ke keranjang!", "success")
+            return redirect('home')
         else:
             return 'Error'
             
@@ -426,7 +427,8 @@ def checkout():
     uid = session['id'] 
     cur = mysql.connection.cursor()
     #cur.execute('SELECT * FROM products JOIN accounts ON accounts.uid = products.user_id JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.user_id=%s', (uid,))
-    cur.execute('SELECT * FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid JOIN products ON products.pid = carts.product_id JOIN couriers ON couriers.kid = carts.kurir_id WHERE carts.user_id=%s', (uid,))
+    cur.execute('''SELECT * FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid 
+    JOIN products ON products.pid = carts.product_id JOIN couriers ON couriers.kid = carts.kurir_id WHERE carts.user_id=%s''', (uid,))
     checkout = cur.fetchall()
     sum = mysql.connection.cursor() 
     sum.execute("SELECT SUM(harga*quantity+ongkir) FROM carts JOIN products ON carts.product_id=products.pid WHERE carts.user_id=%s", (uid,)) 
@@ -443,16 +445,20 @@ def updatekurir():
     cur.execute("UPDATE carts SET kurir_id=%s WHERE user_id = %s AND product_id = %s", (id_kurir,uid,pid,))
     mysql.connection.commit()
     lat1 = mysql.connection.cursor() 
-    lat1.execute("SELECT detail_kota.latitude FROM products JOIN accounts ON accounts.uid = products.user_id JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.pid = %s", (pid,)) 
+    lat1.execute('''SELECT detail_kota.latitude FROM products JOIN accounts ON accounts.uid = products.user_id 
+                JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.pid = %s''', (pid,)) 
     lat_asal = lat1.fetchone()
     lng1 = mysql.connection.cursor() 
-    lng1.execute("SELECT detail_kota.longitude FROM products JOIN accounts ON accounts.uid = products.user_id JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.pid = %s", (pid,)) 
+    lng1.execute('''SELECT detail_kota.longitude FROM products JOIN accounts ON accounts.uid = products.user_id 
+                JOIN detail_kota ON detail_kota.kota = accounts.kota WHERE products.pid = %s''', (pid,)) 
     lng_asal = lng1.fetchone()
     lat2 = mysql.connection.cursor() 
-    lat2.execute("SELECT detail_kota.latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid WHERE user_id=%s", (uid,)) 
+    lat2.execute('''SELECT detail_kota.latitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota 
+                JOIN carts ON carts.user_id = accounts.uid WHERE user_id=%s''', (uid,)) 
     lat_tujuan = lat2.fetchone()
     lng2 = mysql.connection.cursor() 
-    lng2.execute("SELECT detail_kota.longitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota JOIN carts ON carts.user_id = accounts.uid WHERE user_id=%s", (uid,)) #halo lih
+    lng2.execute('''SELECT detail_kota.longitude FROM detail_kota JOIN accounts ON detail_kota.kota = accounts.kota 
+                JOIN carts ON carts.user_id = accounts.uid WHERE user_id=%s''', (uid,))
     lng_tujuan = lng2.fetchone()
     kur = mysql.connection.cursor() 
     kur.execute("SELECT kurir_id FROM carts WHERE user_id=%s and product_id=%s", (uid,pid,)) 
@@ -493,16 +499,51 @@ def bayar():
     cur.execute("UPDATE orderdetails SET status = 'Unpaid' WHERE user_id=%s", (uid,)) 
     mysql.connection.commit()
     cur.close()
-    return redirect(url_for('home'))
+    flash("Pesanan berhasil! Tunggu pesanan dikirim oleh penjual", "success")
+    return redirect('home')
 
+#ini nanti dioff-kan
 @app.route('/status')
 def status():
     uid = session['id']
     cur = mysql.connection.cursor() 
-    cur.execute("SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails JOIN products ON orderdetails.product_id=products.pid WHERE orderdetails.user_id=%s", (uid,))
+    cur.execute('''SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails 
+                JOIN products ON orderdetails.product_id=products.pid 
+                WHERE orderdetails.user_id=%s''', (uid,))
     status = cur.fetchall()
     cur.close()
     return render_template('status.html', status=status)
+
+@app.route('/status-unpaid')
+def unpaidBuyer():
+    uid = session['id']
+    cur = mysql.connection.cursor() 
+    cur.execute('''SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails 
+                JOIN products ON orderdetails.product_id=products.pid
+                WHERE orderdetails.user_id=%s AND status = 'Unpaid' ''', (uid,))
+    status = cur.fetchall()
+    cur.close()
+    return render_template('status-buyer-unpaid.html', status=status)
+
+@app.route('/status-delivered')
+def deliveredBuyer():
+    uid = session['id']
+    cur = mysql.connection.cursor() 
+    cur.execute('''SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails 
+                JOIN products ON orderdetails.product_id=products.pid 
+                WHERE orderdetails.user_id=%s AND status = 'Delivered' ''', (uid,))
+    status = cur.fetchall()
+    cur.close()
+    return render_template('status-buyer-delivered.html', status=status)
+
+@app.route('/status-finished')
+def finishedBuyer():
+    uid = session['id']
+    cur = mysql.connection.cursor() 
+    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE log_order.user_id=%s Order BY log_order.tanggal DESC", (uid,))
+    finish = cur.fetchall()
+    cur.close()
+    return render_template('status-buyer-finished.html', status=finish)
 
 @app.route('/updateOrderStatusBuyer', methods=['POST'])
 def updateOrderStatusBuyer():
@@ -513,32 +554,69 @@ def updateOrderStatusBuyer():
     cur.execute("DELETE FROM orderdetails WHERE status='Paid/Finished' and user_id=%s and product_id=%s", (uid,pid,))
     mysql.connection.commit()
     cur.close()
-    return redirect(url_for('status'))
+    return redirect(url_for('finishedBuyer'))
 
-@app.route('/orderStatusSeller')
-def orderStatusSeller():
+#ini nanti dioff-kan
+# @app.route('/status-seller')
+# def orderStatusSeller():
+#     uid = session['id']
+#     cur = mysql.connection.cursor()
+#     cur.execute('''SELECT nama, jumlah, total, status, image_product, orderdetails.product_id FROM orderdetails 
+#                 JOIN products ON orderdetails.product_id=products.pid 
+#                 WHERE products.user_id=%s ''', (uid,))
+#     order_status = cur.fetchall()
+#     cur.close()
+#     return render_template('status-seller.html', order_status=order_status) 
+
+@app.route('/status-seller-unpaid')
+def unpaidSeller():
     uid = session['id']
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT nama, jumlah, total, status, orderdetails.product_id FROM orderdetails JOIN products ON orderdetails.product_id=products.pid WHERE products.user_id=%s", (uid,))
-    order_status = cur.fetchall()
+    cur = mysql.connection.cursor() 
+    cur.execute('''SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails 
+                JOIN products ON orderdetails.product_id=products.pid 
+                WHERE products.user_id=%s AND status = 'Unpaid' ''', (uid,))
+    status = cur.fetchall()
     cur.close()
-    return render_template('status-seller.html', order_status=order_status) 
+    return render_template('status-seller-unpaid.html', status=status)
+
+@app.route('/status-seller-delivered')
+def deliveredSeller():
+    uid = session['id']
+    cur = mysql.connection.cursor() 
+    cur.execute('''SELECT nama, jumlah, total, status, orderdetails.product_id, image_product FROM orderdetails 
+                JOIN products ON orderdetails.product_id=products.pid 
+                WHERE products.user_id=%s AND status = 'Delivered' ''', (uid,))
+    status = cur.fetchall()
+    cur.close()
+    return render_template('status-seller-delivered.html', status=status)
+
+@app.route('/status-seller-finished')
+def finishedSeller():
+    uid = session['id']
+    cur = mysql.connection.cursor() 
+    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE products.user_id=%s Order BY log_order.tanggal DESC", (uid,))
+    finish = cur.fetchall()
+    cur.close()
+    return render_template('status-seller-finish.html', status=finish)
 
 @app.route('/updateOrderStatusSeller', methods=['POST'])
 def updateOrderStatusSeller():
     uid = session['id']
     pid = request.form['product_id']
     cur = mysql.connection.cursor()
-    cur.execute("UPDATE orderdetails as o, (SELECT orderdetails.user_id FROM orderdetails JOIN products ON orderdetails.product_id = products.pid WHERE products.user_id = %s) as x SET o.status='Delivered' WHERE x.user_id=o.user_id and o.product_id=%s", (uid,pid,))
+    cur.execute('''UPDATE orderdetails as o, (SELECT orderdetails.user_id FROM orderdetails JOIN products 
+                ON orderdetails.product_id = products.pid WHERE products.user_id = %s) as x SET o.status='Delivered' 
+                WHERE x.user_id=o.user_id and o.product_id=%s''', (uid,pid,))
     mysql.connection.commit()
     cur.close()
-    return redirect(url_for('orderStatusSeller'))
+    return redirect(url_for('deliveredSeller'))
 
+#ini nanti dioff-kan
 @app.route('/finishedOrder')
 def finishedOrder():
     uid = session['id']
     cur = mysql.connection.cursor() 
-    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE log_order.user_id=%s OR products.user_id=%s Order BY log_order.tanggal DESC", (uid,uid,))
+    cur.execute("SELECT * FROM log_order JOIN products ON log_order.product_id = products.pid WHERE log_order.user_id=%s Order BY log_order.tanggal DESC", (uid,))
     finish = cur.fetchall()
     cur.close()
     return render_template('finished-order.html', status=finish)
@@ -557,7 +635,7 @@ def rating():
             nilai.execute("CALL update_rating()")
             mysql.connection.commit()
             nilai.close()
-    return redirect(url_for('finishedOrder'))
+    return redirect(url_for('finishedBuyer'))
 
 @app.route('/about-us')
 def aboutUs():

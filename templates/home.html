@@ -1,8 +1,4 @@
-{% extends 'layout.html' %}
-
-{% block title %} Home {% endblock %}
-
-{% block body %}
+{% extends 'layout.html' %} {% block title %} Home {% endblock %} {% block body %}
 
 <!-- <div class="header animate__animated animate__fadeInUp animate__fast">
   <img class="decoration-logo animate__animated animate__flip animate__infinite	animate__delay-075s" src="static\img\logo.png" alt="logo">
@@ -13,50 +9,54 @@
     <p class="header-description">Beli Buku Dapat Buku</p>
   </div>    
 </div> -->
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    <span>{{message}}</span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+</div>
 
 <div class="container container-home animate__animated animate__fadeInUp animate__fast">
-  <img c src="static\img\Header.png" alt="header">
- <div class="judul-home">
- <h1>Latest Product</h1>
- <div class="row justify-content-center">
-{% for row in products %}
- <div class="list-produk animate__animated animate__fadeInUp animate__fast">
-  <a class="tombol-detail" href="/products/{{row.0}}">
-    <img c src="{{ row.4 }}" alt="produk">
-    <h5>{{row.1}}</h5>
-    {% if row.8 is none %}
-            <div class="text-tengah-home"> 
-                <h6><img src="{{ url_for('static',filename='img/star.png') }}" style="width: 25px; height: 25px;float: left;position: absolute; left: 51px;" alt="rating"> 0/5.0</h6>
-                
-            </div>
-            {% else %}
-            <div class="text-tengah-home"> 
-                <h6><img src="{{ url_for('static',filename='img/star_fill.png') }}" style="width: 25px; height: 25px;float: left;position: absolute; left: 51px;" alt="rating"> {{row.8}}/5.0</h6>
-                
-            </div>
-            {% endif %}
-    <h6 style="color: #F599A6;">{{row.3 | rupiah}}</h6>
-  </a>
-    <!-- <form method="post" action="{{url_for('addToCart')}}">
+  <img c src="static\img\Header.png" alt="header" />
+  <div class="judul-home">
+    <h1>Latest Product</h1>
+    <div class="row justify-content-center" style="padding-bottom: 191px">
+      {% for row in products %} {% if row.1 and row.2 and row.3 and row.4 and row.5 is not none %}
+      <div class="list-produk animate__animated animate__fadeInUp animate__fast">
+        <a class="tombol-detail" href="/products-{{row.0}}">
+          <img c src="{{ row.4 }}" alt="produk" />
+          <h5>{{row.1}}</h5>
+          {% if row.8 is none %}
+          <div class="text-tengah-home">
+            <h6><img src="{{ url_for('static',filename='img/star.png') }}" style="width: 25px; height: 25px; float: left; position: absolute; left: 51px" alt="rating" /> 0/5.0</h6>
+          </div>
+          {% else %}
+          <div class="text-tengah-home">
+            <h6><img src="{{ url_for('static',filename='img/star_fill.png') }}" style="width: 25px; height: 25px; float: left; position: absolute; left: 51px" alt="rating" /> {{row.8 | rating_rapi}}/5.0</h6>
+          </div>
+          {% endif %}
+          <h6 style="color: #f599a6">{{row.3 | rupiah}}</h6>
+        </a>
+        <!-- <form method="post" action="{{url_for('addToCart')}}">
       <div class="add-to-cart">
         <input type="hidden" name="pid" value="{{ row.0 }}"/>
         <input type="number" name="quantity" class="product-quantity" id="" value="1" min="0" max="{{ row.7 }}">
         <input type="submit" value="Add to Cart" class="default-btn" />
       </div>
     </form> -->
- </div>
+      </div>
+      {% endif %} {% endfor %}
+    </div>
 
- {% endfor %}
+    <!-- <div class="container">
+      <a class="btn btn-link float-right" href="/all-product">Lihat Semua</a>
+    </div>
+     -->
+  </div>
 </div>
-
- <div class="container">
-   <a class="btn btn-link float-right" href="/all-product">Lihat Semua--></a>
-
- </div>
-
-
- </div>
-</div>
-
 
 {% endblock %}

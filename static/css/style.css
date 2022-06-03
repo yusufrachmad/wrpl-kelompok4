@@ -117,6 +117,49 @@
   border-radius: 10px;
 }
 
+.form-group input[type="text"]:focus {
+  outline-color: none;
+}
+
+.form-group label {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 19px;
+  line-height: 37px;
+  text-align: center;
+  color: #fff0e1;
+}
+
+.form-product {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-clip: padding-box;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border-bottom: 3px solid #fff0e1;
+  background-color: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  margin-top: -44px;
+  position: relative;
+  margin-bottom: 36px;
+  left: 132px;
+  width: 324px;
+}
+
+.form-product:focus {
+  background-color: transparent;
+  outline-color: transparent;
+}
+
 .list-produk:hover {
   transition-duration: 700ms;
   box-shadow: 5px 5px gainsboro;
@@ -263,7 +306,6 @@
   font-weight: 800;
   font-size: 16px;
   line-height: 20px;
-  /* identical to box height */
 
   text-align: left;
 
@@ -282,7 +324,6 @@
   font-weight: 600;
   font-size: 16px;
   line-height: 20px;
-  /* identical to box height */
 
   color: rgba(0, 0, 0, 0.7);
 }
@@ -307,7 +348,6 @@
   font-weight: 800;
   font-size: 16px;
   line-height: 20px;
-  /* identical to box height */
 
   color: rgba(0, 0, 0, 0.7);
 }
@@ -411,6 +451,13 @@
   color: #fff0e1;
 }
 
+.form-jumlah-cart:focus {
+  border-color: #b8cdc4;
+  outline-color: #b8cdc4;
+  background-color: transparent;
+  color: #fff0e1;
+}
+
 .label-jumlah-cart,
 .label-kurir-cart {
   font-family: "Montserrat";
@@ -427,6 +474,13 @@
   color: #000000;
   background-color: #b8cdc4;
   border-color: #b8cdc4;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 23px;
+  text-align: center;
+  border-radius: 11px;
 }
 
 .btn-edit:hover {
@@ -443,12 +497,211 @@ tr:nth-child(even) {
   background-color: #fff0e1;
 }
 
-/* Product-Detail */
+/* CheckOut */
+.aksi-produk-co {
+  position: absolute;
+  width: 152px;
+  height: 25px;
+  left: 672px;
+  margin-top: 127px;
+}
+
+.kurir-co {
+  position: absolute;
+  left: 684px;
+  margin-top: 23px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  text-align: center;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.harga-kurir-co {
+  position: absolute;
+  left: 699px;
+  margin-top: 68px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  text-align: center;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.harga-kurir-co-fix {
+  position: absolute;
+  left: 684px;
+  margin-top: 68px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  text-align: center;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.nama-produk-co {
+  position: absolute;
+  width: 232px;
+  height: 20px;
+  left: 273px;
+  margin-top: 25px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  text-align: left;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.harga-produk-co {
+  position: absolute;
+  width: 80px;
+  height: 20px;
+  left: 273px;
+  margin-top: 79px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.kota-co {
+  margin-top: 149px;
+  left: 273px;
+  position: absolute;
+  border-top: none;
+}
+
+.stock-co {
+  position: absolute;
+  width: 189px;
+  height: 20px;
+  left: 273px;
+  margin-top: 52px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.desc-co {
+  position: absolute;
+  width: 517px;
+  height: 80px;
+  left: 522px;
+  margin-top: 3px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.nama-produk-lp {
+  position: absolute;
+  width: 232px;
+  height: 20px;
+  left: 273px;
+  margin-top: 3px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  text-align: left;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.harga-produk-lp {
+  position: absolute;
+  width: 80px;
+  height: 20px;
+  left: 273px;
+  margin-top: 97px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.aksi-lp {
+  position: absolute;
+  left: 1084px;
+  width: 10px;
+  margin-top: 17px;
+  text-align: center;
+}
+
+/* Product Detail */
 .product-detail {
   text-align: justify;
   padding: 10px;
   width: 100%;
   margin-top: 93px;
+}
+
+.product-quantity {
+  position: absolute;
+  left: -171px;
+  margin-top: 41px;
+  width: 69px;
+  float: right;
+  margin-right: 83px;
+  background-color: transparent;
+  border-color: #f599a6;
+  font-weight: 900;
+  color: #000000;
+  border-radius: 10px;
+}
+
+.product-quantity:hover {
+  background-color: transparent;
+  border-color: #f599a6;
+  font-weight: 900;
+  color: #000000;
+}
+
+.btn-add {
+  position: absolute;
+  margin-top: 37px;
+  left: -88px;
 }
 
 .product-detail img {
@@ -547,6 +800,24 @@ input[type="number"] {
   text-align: center;
   color: white;
   background-color: blue;
+}
+
+.row-product-detail {
+  display: block;
+}
+
+.penjual-pd {
+  position: absolute;
+  width: 450px;
+  margin-top: 98px;
+  left: 445px;
+}
+
+.tersedia-pd {
+  position: absolute;
+  left: -171px;
+  margin-top: 5px;
+  font-family: "Montserrat";
 }
 
 /* Cart Kalo ga perlu hapus aja :v */
@@ -813,11 +1084,11 @@ footer {
 }
 
 #foto,
-#password,
-#nama,
-#email,
-#notelp,
-#alamat {
+#password-user,
+#nama-user,
+#email-user,
+#notelp-user,
+#alamat-user {
   width: 100%;
   height: 100%;
   position: fixed;
@@ -829,11 +1100,11 @@ footer {
 }
 
 #foto:target,
-#password:target,
-#nama:target,
-#email:target,
-#notelp:target,
-#alamat:target {
+#password-user:target,
+#nama-user:target,
+#email-user:target,
+#notelp-user:target,
+#alamat-user:target {
   visibility: visible;
 }
 
@@ -878,11 +1149,91 @@ footer {
   color: #ffffff;
   background-color: #ffbab3;
   border-color: #ffbab3;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 23px;
+  line-height: 23px;
+  text-align: center;
+  border-radius: 11px;
 }
 
 .btn-pink:hover {
   background-color: #ef9086;
   border-color: #ef9086;
+}
+
+.btn-outline-pink {
+  color: #ffbab3;
+  background-color: transparent;
+  border-color: #ffbab3;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 23px;
+  line-height: 23px;
+  text-align: center;
+  border-radius: 11px;
+}
+
+.btn-outline-pink:hover {
+  background-color: #ffbab3;
+  border-color: #ffbab3;
+  color: #ffffff;
+}
+
+.btn-tmbh-data {
+  position: absolute;
+  margin-top: 51px;
+  left: 1063px;
+  width: 168px;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 28px;
+  text-align: center;
+  color: #000000;
+  border-radius: 12px;
+}
+
+.btn-line {
+  color: #000000;
+  background-color: transparent;
+  border-bottom-color: #000000;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 23px;
+  text-align: center;
+  width: 26%;
+  height: 36px;
+  margin-left: -6px;
+}
+
+.btn-line-now {
+  color: #ffbab3;
+  background-color: transparent;
+  border-bottom-color: #ffbab3;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 23px;
+  text-align: center;
+  width: 26%;
+  height: 36px;
+  margin-left: -6px;
+}
+
+.btn-line:hover {
+  color: #ffbab3;
+  border-bottom-color: #ffbab3;
 }
 
 .informasi {
@@ -903,6 +1254,94 @@ footer {
   height: 29px;
   left: 764px;
   top: 212px;
+}
+
+/* Order Status */
+.jumlah-order-status {
+  position: absolute;
+  width: 86px;
+  height: 20px;
+  margin-top: 45px;
+  left: 274px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.harga-order-status {
+  position: absolute;
+  width: 200px;
+  height: 20px;
+  left: 1018px;
+  margin-top: 97px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.deliver-os {
+  position: absolute;
+  margin-top: 30px;
+  left: 1054px;
+}
+
+.status-order-status {
+  position: absolute;
+  width: 200px;
+  height: 20px;
+  left: 995px;
+  margin-top: 3px;
+  text-align: center;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.garis-status-seller {
+  position: absolute;
+  width: 925px;
+  height: 0px;
+  left: 270px;
+  margin-top: 79px;
+  border: 1px solid #000000;
+}
+
+.tab-order-status {
+  position: absolute;
+  margin-top: 13px;
+  left: 139px;
+  width: 1409px;
+}
+.no-records {
+  margin-top: 73px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 23px;
+  line-height: 20px;
+}
+
+.rating-os {
+  position: absolute;
+  margin-top: 31px;
+  left: 1068px;
+  border: none;
 }
 
 /* Rating */
@@ -1282,5 +1721,60 @@ footer {
     float: right;
     right: 465px;
     left: auto;
+  }
+
+  .background-total-bayar {
+    left: 1221px;
+  }
+
+  .nama-produk-lp,
+  .stock-co,
+  .harga-produk-lp {
+    left: 552px;
+  }
+
+  .desc-co {
+    left: 801px;
+  }
+
+  .aksi-lp {
+    left: 1363px;
+  }
+
+  .btn-tmbh-data {
+    left: 1342px;
+  }
+
+  .tab-order-status {
+    left: 418px;
+  }
+
+  .jumlah-order-status {
+    left: 553px;
+  }
+
+  .garis-status-seller {
+    left: 549px;
+  }
+
+  .harga-order-status {
+    left: 1297px;
+  }
+
+  .status-order-status {
+    left: 1274px;
+  }
+
+  .deliver-os {
+    left: 1333px;
+  }
+
+  .isian-kanan {
+    width: 552px;
+    left: 1072px;
+  }
+
+  .line-login {
+    height: 750px;
   }
 }
