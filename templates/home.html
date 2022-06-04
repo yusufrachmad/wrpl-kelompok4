@@ -21,7 +21,13 @@
 </div>
 
 <div class="container container-home animate__animated animate__fadeInUp animate__fast">
-  <img c src="static\img\Header.png" alt="header" />
+  <div class="slider">
+    <div class="isi-slider">
+      <img src="static\img\Banner.png" alt="header1" />
+      <img src="static\img\slide-2.png" alt="header2" />
+      <img src="static\img\slide-3.png" alt="header3" />
+    </div>
+  </div>
   <div class="judul-home">
     <h1>Latest Product</h1>
     <div class="row justify-content-center" style="padding-bottom: 191px">
@@ -32,7 +38,10 @@
           <h5>{{row.1}}</h5>
           {% if row.8 is none %}
           <div class="text-tengah-home">
-            <h6><img src="{{ url_for('static',filename='img/star.png') }}" style="width: 25px; height: 25px; float: left; position: absolute; left: 51px" alt="rating" /> 0/5.0</h6>
+            <h6 style="font-size: smaller; font-weight: ligther">
+              <!--<img src="{{ url_for('static',filename='img/star.png') }}" style="width: 25px; height: 25px; float: left; position: absolute; left: 51px" alt="rating" />-->
+              Belum ada penilaian
+            </h6>
           </div>
           {% else %}
           <div class="text-tengah-home">
